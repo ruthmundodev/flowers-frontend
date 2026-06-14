@@ -1,0 +1,94 @@
+<div class="login-wrap">
+  <div class="login-left">
+    <svg class="login-left-bg" viewBox="0 0 500 560" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="80"  cy="80"  r="130" fill="#7ec47e"/>
+      <circle cx="400" cy="480" r="170" fill="#7ec47e"/>
+      <circle cx="420" cy="110" r="70"  fill="#7ec47e"/>
+      <circle cx="50"  cy="460" r="90"  fill="#7ec47e"/>
+    </svg>
+    <div class="login-left-content">
+      <div class="ll-brand">
+        <div class="ll-brand-dot"></div>
+        <span class="ll-brand-name">SembraApp</span>
+      </div>
+      <div class="ll-hero">
+        <div class="ll-tag">GESTIÓN AGRÍCOLA</div>
+        <div class="ll-title">
+          Controla tu siembra,<br>
+          <span>cosecha más.</span>
+        </div>
+        <div class="ll-sub">
+          Registra cada ciclo, monitorea tu stock de semillas y toma
+          decisiones con datos reales de tu finca.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <div class="lr-brand">
+      <div class="lr-brand-dot"></div>
+      <span class="lr-brand-text">SembraApp · Finca El Roble</span>
+    </div>
+    <div class="lr-title">Bienvenido de vuelta</div>
+    <div class="lr-sub">Ingresa a tu cuenta para continuar</div>
+
+    <div class="field">
+      <div class="field-label">Correo electrónico</div>
+      <div class="field-input" [class.active]="email.length > 0">
+        <i class="ti ti-mail"></i>
+        <input
+          type="email"
+          placeholder="tu@correo.com"
+          [(ngModel)]="email"
+          name="email"
+          autocomplete="email"
+        />
+      </div>
+      <div class="field-error" *ngIf="submitted && !email">
+        El correo es obligatorio
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        Contraseña
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+      <div class="field-input" [class.active]="password.length > 0">
+        <i class="ti ti-lock"></i>
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Tu contraseña"
+          [(ngModel)]="password"
+          name="password"
+          autocomplete="current-password"
+        />
+        <i
+          class="ti"
+          [class.ti-eye]="!showPassword"
+          [class.ti-eye-off]="showPassword"
+          (click)="togglePassword()"
+          style="cursor:pointer;"
+        ></i>
+      </div>
+      <div class="field-error" *ngIf="submitted && !password">
+        La contraseña es obligatoria
+      </div>
+    </div>
+
+
+    <div class="login-error" *ngIf="errorMessage">
+      <i class="ti ti-alert-circle"></i>
+      {{ errorMessage }}
+    </div>
+
+    <button
+      class="btn-primary"
+      (click)="onSubmit()"
+      [disabled]="loading"
+    >
+      {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
+    </button>
+  </div>
+</div>
