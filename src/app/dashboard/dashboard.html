@@ -1,1 +1,314 @@
-<p>dashboard works!</p>
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-dot"></div>
+            <span class="brand-name">SembraApp</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">General</div>
+            <a class="nav-item active" href="#">
+                <i class="ti ti-layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-item" href="#">
+                <i class="ti ti-seeding"></i>
+                <span>Siembras</span>
+                <span class="nav-badge">3</span>
+            </a>
+            <a class="nav-item" href="#">
+                <i class="ti ti-basket"></i>
+                <span>Cosechas</span>
+            </a>
+            <a class="nav-item" href="#">
+                <i class="ti ti-box"></i>
+                <span>Inventario</span>
+                <span class="nav-badge nav-badge--warn">2</span>
+            </a>
+
+            <div class="nav-group-label">Reportes</div>
+            <a class="nav-item" href="#">
+                <i class="ti ti-chart-bar"></i>
+                <span>Rendimientos</span>
+            </a>
+            <a class="nav-item" href="#">
+                <i class="ti ti-map"></i>
+                <span>Parcelas</span>
+            </a>
+            <a class="nav-item" href="#">
+                <i class="ti ti-file-export"></i>
+                <span>Exportar</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="farm-avatar">FR</div>
+            <div class="farm-info">
+                <div class="farm-name">Finca El Roble</div>
+                <div class="farm-season">Temporada 2025–26</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <h1 class="page-title">Dashboard</h1>
+            <div class="topbar-right">
+                <div class="search-box">
+                    <i class="ti ti-search"></i>
+                    <input type="text" placeholder="Buscar cultivo, parcela..." />
+                </div>
+                <button class="btn-new">
+                    <i class="ti ti-plus"></i>
+                    Nueva siembra
+                </button>
+            </div>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stat-cards">
+            <div class="stat-card stat-card--green">
+                <div class="stat-card-top">
+                    <i class="ti ti-plant-2"></i>
+                    <span class="stat-card-label">Cultivos activos</span>
+                </div>
+                <div class="stat-card-num">14</div>
+                <div class="stat-card-sub">+2 este mes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-top">
+                    <i class="ti ti-clock"></i>
+                    <span class="stat-card-label">Cosechas pendientes</span>
+                </div>
+                <div class="stat-card-num">3</div>
+                <div class="stat-card-sub">Próxima: 18 may</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-top">
+                    <i class="ti ti-package"></i>
+                    <span class="stat-card-label">Stock total</span>
+                </div>
+                <div class="stat-card-num">842 kg</div>
+                <div class="stat-card-sub">8 variedades</div>
+            </div>
+            <div class="stat-card stat-card--warn">
+                <div class="stat-card-top">
+                    <i class="ti ti-alert-triangle"></i>
+                    <span class="stat-card-label">Stock bajo</span>
+                </div>
+                <div class="stat-card-num">2</div>
+                <div class="stat-card-sub">Requieren reabasto</div>
+            </div>
+        </div>
+
+        <!-- CONTENT GRID -->
+        <div class="content-grid">
+
+            <!-- CULTIVOS TABLE -->
+            <div class="card cultivos-card">
+                <div class="card-header">
+                    <span class="card-title">Cultivos activos</span>
+                    <a class="card-link" href="#">Ver todos →</a>
+                </div>
+                <table class="cultivos-table">
+                    <thead>
+                        <tr>
+                            <th>Semilla / parcela</th>
+                            <th>Área</th>
+                            <th>Estado</th>
+                            <th>Stock</th>
+                            <th>Cosecha est.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="cultivo-name">
+                                    <div class="cultivo-icon">🌽</div>
+                                    <div>
+                                        <div class="cultivo-title">Maíz criollo</div>
+                                        <div class="cultivo-sub">Parcela B4</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>1.5 mz</td>
+                            <td><span class="badge badge--green">En crecimiento</span></td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width:80%"></div>
+                                </div>
+                            </td>
+                            <td>jun 2025</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cultivo-name">
+                                    <div class="cultivo-icon">🌶️</div>
+                                    <div>
+                                        <div class="cultivo-title">Chile pimiento</div>
+                                        <div class="cultivo-sub">Parcela C1</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>0.8 mz</td>
+                            <td><span class="badge badge--lime">Lista cosecha</span></td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width:95%"></div>
+                                </div>
+                            </td>
+                            <td class="date-warn">18 may 2025</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cultivo-name">
+                                    <div class="cultivo-icon">🫘</div>
+                                    <div>
+                                        <div class="cultivo-title">Frijol negro</div>
+                                        <div class="cultivo-sub">Parcela A3</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>2.0 mz</td>
+                            <td><span class="badge badge--green">En crecimiento</span></td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-fill--warn" style="width:40%"></div>
+                                </div>
+                            </td>
+                            <td>ago 2025</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cultivo-name">
+                                    <div class="cultivo-icon">🍅</div>
+                                    <div>
+                                        <div class="cultivo-title">Tomate manzano</div>
+                                        <div class="cultivo-sub">Parcela D2</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>0.5 mz</td>
+                            <td><span class="badge badge--red">Stock bajo</span></td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-fill--danger" style="width:8%"></div>
+                                </div>
+                            </td>
+                            <td>jul 2025</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="cultivo-name">
+                                    <div class="cultivo-icon">🥬</div>
+                                    <div>
+                                        <div class="cultivo-title">Lechuga romana</div>
+                                        <div class="cultivo-sub">Invernadero 1</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>0.3 mz</td>
+                            <td><span class="badge badge--gray">Planeado</span></td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width:60%"></div>
+                                </div>
+                            </td>
+                            <td>sep 2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-col">
+
+                <!-- ACTIVIDAD RECIENTE -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Actividad reciente</span>
+                        <i class="ti ti-bell"></i>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon activity-icon--green">
+                                <i class="ti ti-basket"></i>
+                            </div>
+                            <div class="activity-info">
+                                <div class="activity-title">Cosecha registrada</div>
+                                <div class="activity-sub">Frijol negro · 95 kg · P. A1</div>
+                                <div class="activity-time">Hoy, 9:14 am</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon activity-icon--teal">
+                                <i class="ti ti-seeding"></i>
+                            </div>
+                            <div class="activity-info">
+                                <div class="activity-title">Siembra registrada</div>
+                                <div class="activity-sub">Maíz criollo · 38 kg · P. B4</div>
+                                <div class="activity-time">Ayer, 2:30 pm</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon activity-icon--warn">
+                                <i class="ti ti-alert-triangle"></i>
+                            </div>
+                            <div class="activity-info">
+                                <div class="activity-title">Alerta de stock</div>
+                                <div class="activity-sub">Tomate manzano · quedan 6 kg</div>
+                                <div class="activity-time">Ayer, 8:00 am</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COSECHAS POR MES -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Cosechas por mes</span>
+                    </div>
+                    <div class="chart-sub">kg cosechados · últimos 6 meses</div>
+                    <div class="bar-chart">
+                        <div class="bar-col">
+                            <div class="bar-value">210</div>
+                            <div class="bar" style="height:48%"></div>
+                            <div class="bar-label">Dic</div>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-value">380</div>
+                            <div class="bar" style="height:86%"></div>
+                            <div class="bar-label">Ene</div>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-value">155</div>
+                            <div class="bar" style="height:35%"></div>
+                            <div class="bar-label">Feb</div>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-value">290</div>
+                            <div class="bar" style="height:66%"></div>
+                            <div class="bar-label">Mar</div>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-value">440</div>
+                            <div class="bar bar--dark" style="height:100%"></div>
+                            <div class="bar-label">Abr</div>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-value">95</div>
+                            <div class="bar" style="height:22%"></div>
+                            <div class="bar-label">May</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
