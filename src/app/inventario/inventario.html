@@ -1,0 +1,121 @@
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-dot"></div>
+      <span class="brand-name">SembraApp</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">General</div>
+      <a class="nav-item" routerLink="/dashboard"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-seeding"></i><span>Siembras</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-basket"></i><span>Cosechas</span></a>
+      <a class="nav-item active" routerLink="/inventario"><i class="ti ti-package"></i><span>Inventario</span></a>
+      <div class="nav-group-label">Reportes</div>
+      <a class="nav-item" href="#"><i class="ti ti-chart-bar"></i><span>Rendimientos</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-map-2"></i><span>Parcelas</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-file-export"></i><span>Exportar</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="farm-avatar">FR</div>
+      <div class="farm-info">
+        <div class="farm-name">Finca El Roble</div>
+        <div class="farm-season">Temporada 2025–26</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Inventario de semillas</span>
+      <div class="topbar-right">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" placeholder="Buscar semilla..." [(ngModel)]="busqueda" />
+        </div>
+        <button class="btn-light"><i class="ti ti-filter"></i> Filtrar</button>
+        <button class="btn-new"><i class="ti ti-plus"></i> Agregar semilla</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- KPI CARDS -->
+      <div class="kpi-row">
+        <div class="kpi-card kpi-card--green">
+          <div class="kpi-label"><i class="ti ti-stack"></i> Total variedades</div>
+          <div class="kpi-val">{{ totalVariedades }}</div>
+          <div class="kpi-sub">8 con stock activo</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i class="ti ti-scale"></i> Kg totales</div>
+          <div class="kpi-val">{{ kgTotales }}</div>
+          <div class="kpi-sub">En almacén</div>
+        </div>
+        <div class="kpi-card kpi-card--warn">
+          <div class="kpi-label"><i class="ti ti-alert-circle"></i> Stock crítico</div>
+          <div class="kpi-val">{{ stockCritico }}</div>
+          <div class="kpi-sub">Menos de 10 kg</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i class="ti ti-refresh"></i> Reabasto pendiente</div>
+          <div class="kpi-val">{{ reasastoPendiente }}</div>
+          <div class="kpi-sub">Pedido en curso</div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="sec-header">
+        <span class="sec-title">Todas las semillas</span>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Variedad</th>
+                <th>Tipo</th>
+                <th>Stock (kg)</th>
+                <th>Nivel</th>
+                <th>Últ. siembra</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of semillasFiltradas">
+                <td>
+                  <div class="seed-name-cell">
+                    <div class="seed-icon" [style.background]="s.iconoBg">{{ s.icono }}</div>
+                    <div>
+                      <div class="seed-title">{{ s.nombre }}</div>
+                      <div class="seed-sub">{{ s.descripcion }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-muted">{{ s.tipo }}</td>
+                <td class="stock-val" [ngClass]="stockClass(s.estado)">{{ s.stock }} kg</td>
+                <td>
+                  <div class="level-cell">
+                    <div class="prog-bg">
+                      <div class="prog-fill" [ngClass]="progClass(s.nivel)" [style.width.%]="s.nivel"></div>
+                    </div>
+                    <span class="prog-pct" [ngClass]="pctClass(s.nivel)">{{ s.nivel }}%</span>
+                  </div>
+                </td>
+                <td class="text-muted">{{ s.ultimaSiembra }}</td>
+                <td><span class="badge" [ngClass]="badgeClass(s.estado)">{{ s.estado }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
