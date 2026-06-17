@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Sidebar } from '../shared/sidebar/sidebar';
 
 export interface Semilla {
   icono: string;
@@ -17,7 +18,7 @@ export interface Semilla {
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, Sidebar],
   templateUrl: './inventario.html',
   styleUrl: './inventario.scss',
 })
