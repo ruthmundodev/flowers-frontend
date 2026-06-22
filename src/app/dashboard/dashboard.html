@@ -27,31 +27,31 @@
                     <i class="ti ti-plant-2"></i>
                     <span class="stat-card-label">Cultivos activos</span>
                 </div>
-                <div class="stat-card-num">14</div>
-                <div class="stat-card-sub">+2 este mes</div>
+                <div class="stat-card-num">{{ stats.cultivosActivos }}</div>
+                <div class="stat-card-sub">{{ stats.totalVariedades }} variedades</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-top">
                     <i class="ti ti-clock"></i>
                     <span class="stat-card-label">Cosechas pendientes</span>
                 </div>
-                <div class="stat-card-num">3</div>
-                <div class="stat-card-sub">Próxima: 18 may</div>
+                <div class="stat-card-num">{{ stats.variedadesStockBajo }}</div>
+                <div class="stat-card-sub">Próxima: {{ formatProximaCosecha(stats.proximaCosecha) }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-top">
                     <i class="ti ti-package"></i>
                     <span class="stat-card-label">Stock total</span>
                 </div>
-                <div class="stat-card-num">842 kg</div>
-                <div class="stat-card-sub">8 variedades</div>
+                <div class="stat-card-num">{{ stats.stockTotalKg | number:'1.0-0' }} kg</div>
+                <div class="stat-card-sub">{{ stats.totalVariedades }} variedades</div>
             </div>
             <div class="stat-card stat-card--warn">
                 <div class="stat-card-top">
                     <i class="ti ti-alert-triangle"></i>
                     <span class="stat-card-label">Stock bajo</span>
                 </div>
-                <div class="stat-card-num">2</div>
+                <div class="stat-card-num">{{ stats.variedadesStockBajo }}</div>
                 <div class="stat-card-sub">Requieren reabasto</div>
             </div>
         </div>
@@ -63,113 +63,48 @@
             <div class="card cultivos-card">
                 <div class="card-header">
                     <span class="card-title">Cultivos activos</span>
-                    <a class="card-link" href="#">Ver todos →</a>
+                    <a class="card-link" routerLink="/inventario">Ver todos →</a>
                 </div>
                 <table class="cultivos-table">
                     <thead>
                         <tr>
                             <th>Semilla / parcela</th>
-                            <th>Área</th>
+                            <th>Cantidad</th>
                             <th>Estado</th>
                             <th>Stock</th>
                             <th>Cosecha est.</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr *ngFor="let c of cultivosActivos">
                             <td>
                                 <div class="cultivo-name">
-                                    <div class="cultivo-icon">🌽</div>
+                                    <div class="cultivo-icon">{{ getIcono(c.variedadNombre) }}</div>
                                     <div>
-                                        <div class="cultivo-title">Maíz criollo</div>
-                                        <div class="cultivo-sub">Parcela B4</div>
+                                        <div class="cultivo-title">{{ c.variedadNombre }}</div>
+                                        <div class="cultivo-sub">{{ c.invernaderoNombre }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td>1.5 mz</td>
-                            <td><span class="badge badge--green">En crecimiento</span></td>
+                            <td>{{ c.cantidad | number:'1.0-0' }} kg</td>
+                            <td>
+                                <span class="badge" [ngClass]="estadoBadgeClass(c.estado)">
+                                    {{ c.estado }}
+                                </span>
+                            </td>
                             <td>
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width:80%"></div>
+                                    <div class="progress-fill"
+                                         [ngClass]="progClass(c.nivelPct)"
+                                         [style.width.%]="c.nivelPct"></div>
                                 </div>
                             </td>
-                            <td>jun 2025</td>
+                            <td>{{ formatFechaCosecha(c.fechaPoda) }}</td>
                         </tr>
-                        <tr>
-                            <td>
-                                <div class="cultivo-name">
-                                    <div class="cultivo-icon">🌶️</div>
-                                    <div>
-                                        <div class="cultivo-title">Chile pimiento</div>
-                                        <div class="cultivo-sub">Parcela C1</div>
-                                    </div>
-                                </div>
+                        <tr *ngIf="cultivosActivos.length === 0">
+                            <td colspan="5" style="text-align:center; padding: 1.5rem; color: #9ca3af;">
+                                Sin cultivos activos registrados
                             </td>
-                            <td>0.8 mz</td>
-                            <td><span class="badge badge--lime">Lista cosecha</span></td>
-                            <td>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width:95%"></div>
-                                </div>
-                            </td>
-                            <td class="date-warn">18 may 2025</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="cultivo-name">
-                                    <div class="cultivo-icon">🫘</div>
-                                    <div>
-                                        <div class="cultivo-title">Frijol negro</div>
-                                        <div class="cultivo-sub">Parcela A3</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>2.0 mz</td>
-                            <td><span class="badge badge--green">En crecimiento</span></td>
-                            <td>
-                                <div class="progress-bar">
-                                    <div class="progress-fill progress-fill--warn" style="width:40%"></div>
-                                </div>
-                            </td>
-                            <td>ago 2025</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="cultivo-name">
-                                    <div class="cultivo-icon">🍅</div>
-                                    <div>
-                                        <div class="cultivo-title">Tomate manzano</div>
-                                        <div class="cultivo-sub">Parcela D2</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>0.5 mz</td>
-                            <td><span class="badge badge--red">Stock bajo</span></td>
-                            <td>
-                                <div class="progress-bar">
-                                    <div class="progress-fill progress-fill--danger" style="width:8%"></div>
-                                </div>
-                            </td>
-                            <td>jul 2025</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="cultivo-name">
-                                    <div class="cultivo-icon">🥬</div>
-                                    <div>
-                                        <div class="cultivo-title">Lechuga romana</div>
-                                        <div class="cultivo-sub">Invernadero 1</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>0.3 mz</td>
-                            <td><span class="badge badge--gray">Planeado</span></td>
-                            <td>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width:60%"></div>
-                                </div>
-                            </td>
-                            <td>sep 2025</td>
                         </tr>
                     </tbody>
                 </table>
@@ -211,8 +146,10 @@
                             </div>
                             <div class="activity-info">
                                 <div class="activity-title">Alerta de stock</div>
-                                <div class="activity-sub">Tomate manzano · quedan 6 kg</div>
-                                <div class="activity-time">Ayer, 8:00 am</div>
+                                <div class="activity-sub">
+                                    {{ stats.variedadesStockBajo }} variedad(es) con stock bajo
+                                </div>
+                                <div class="activity-time">Actualizado ahora</div>
                             </div>
                         </div>
                     </div>
@@ -225,36 +162,18 @@
                     </div>
                     <div class="chart-sub">kg cosechados · últimos 6 meses</div>
                     <div class="bar-chart">
-                        <div class="bar-col">
-                            <div class="bar-value">210</div>
-                            <div class="bar" style="height:48%"></div>
-                            <div class="bar-label">Dic</div>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-value">380</div>
-                            <div class="bar" style="height:86%"></div>
-                            <div class="bar-label">Ene</div>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-value">155</div>
-                            <div class="bar" style="height:35%"></div>
-                            <div class="bar-label">Feb</div>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-value">290</div>
-                            <div class="bar" style="height:66%"></div>
-                            <div class="bar-label">Mar</div>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-value">440</div>
-                            <div class="bar bar--dark" style="height:100%"></div>
-                            <div class="bar-label">Abr</div>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-value">95</div>
-                            <div class="bar" style="height:22%"></div>
-                            <div class="bar-label">May</div>
-                        </div>
+                        <ng-container *ngIf="cosechasMes.length > 0; else sinDatos">
+                            <div class="bar-col" *ngFor="let m of cosechasMes">
+                                <div class="bar-value">{{ m.totalKg | number:'1.0-0' }}</div>
+                                <div class="bar" [style.height.%]="barHeight(m.totalKg)"></div>
+                                <div class="bar-label">{{ m.mes }}</div>
+                            </div>
+                        </ng-container>
+                        <ng-template #sinDatos>
+                            <div style="width:100%; text-align:center; color:#9ca3af; padding:1rem 0; font-size:.875rem;">
+                                Sin datos de siembras recientes
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
 

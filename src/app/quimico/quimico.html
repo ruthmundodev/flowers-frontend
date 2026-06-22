@@ -1,0 +1,151 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Químicos y fumigaciones</span>
+      <div class="topbar-right">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" placeholder="Buscar químico o variedad..." [(ngModel)]="busqueda" />
+        </div>
+        <button class="btn-new" (click)="abrirModalCrear()">
+          <i class="ti ti-plus"></i> Agregar
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- KPI CARDS -->
+      <div class="kpi-row">
+        <div class="kpi-card kpi-card--green">
+          <div class="kpi-label"><i class="ti ti-flask"></i> Total registros</div>
+          <div class="kpi-val">{{ totalRegistros }}</div>
+          <div class="kpi-sub">Fumigaciones registradas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i class="ti ti-calendar-month"></i> Este mes</div>
+          <div class="kpi-val">{{ fumigacionesMes }}</div>
+          <div class="kpi-sub">Fumigaciones en el mes actual</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i class="ti ti-plant-2"></i> Variedades tratadas</div>
+          <div class="kpi-val">{{ variedadesTratadas }}</div>
+          <div class="kpi-sub">Con al menos 1 fumigación</div>
+        </div>
+        <div class="kpi-card kpi-card--warn">
+          <div class="kpi-label"><i class="ti ti-clock"></i> Última fumigación</div>
+          <div class="kpi-val kpi-val--sm">{{ ultimaFumigacion }}</div>
+          <div class="kpi-sub">Fecha más reciente</div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="sec-header">
+        <span class="sec-title">Todos los registros</span>
+      </div>
+
+      <!-- Loading -->
+      <div class="state-msg" *ngIf="cargando">Cargando...</div>
+      <div class="state-msg state-msg--error" *ngIf="error">Error al cargar datos.</div>
+
+      <div class="card" *ngIf="!cargando && !error">
+        <div class="table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th style="width:22%">Nombre</th>
+                <th style="width:18%">Variedad</th>
+                <th style="width:14%">Fecha fumigación</th>
+                <th>Descripción</th>
+                <th style="width:90px">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let q of quimicosFiltrados">
+                <td>
+                  <div class="quimico-name-cell">
+                    <div class="quimico-icon"><i class="ti ti-flask"></i></div>
+                    <span class="q-nombre">{{ q.nombre }}</span>
+                  </div>
+                </td>
+                <td class="text-muted">{{ q.variedadNombre ?? '—' }}</td>
+                <td class="text-muted">{{ formatFecha(q.fechaFumigacion) }}</td>
+                <td class="text-muted desc-cell">{{ q.descripcion || '—' }}</td>
+                <td>
+                  <div class="action-btns">
+                    <button class="btn-action btn-action--edit" (click)="abrirModalEditar(q)" title="Editar">
+                      <i class="ti ti-pencil"></i>
+                    </button>
+                    <button class="btn-action btn-action--del" (click)="eliminar(q)" title="Eliminar">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="quimicosFiltrados.length === 0">
+                <td colspan="5" class="empty-row">Sin registros</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ── MODAL ──────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="modalVisible" (click)="cerrarModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <span class="modal-title">{{ modoEdicion ? 'Editar químico' : 'Nuevo químico' }}</span>
+      <button class="modal-close" (click)="cerrarModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field" *ngIf="errorModal">
+        <div class="field-error">{{ errorModal }}</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Nombre <span class="req">*</span></label>
+        <input class="field-input" type="text" placeholder="Ej. Roundup, Confidor..." [(ngModel)]="form.nombre" />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Variedad <span class="req">*</span></label>
+        <select class="field-input" [(ngModel)]="form.variedadId">
+          <option [ngValue]="null" disabled>Selecciona una variedad</option>
+          <option *ngFor="let v of variedades" [ngValue]="v.id">{{ v.nombre }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Fecha de fumigación <span class="req">*</span></label>
+        <input class="field-input" type="date" [(ngModel)]="form.fechaFumigacion" />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Descripción</label>
+        <textarea class="field-input field-textarea"
+                  placeholder="Dosis, método de aplicación, observaciones..."
+                  [(ngModel)]="form.descripcion"
+                  rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
+      <button class="btn-new" (click)="guardar()" [disabled]="guardando">
+        <i class="ti ti-check"></i>
+        {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Guardar') }}
+      </button>
+    </div>
+
+  </div>
+</div>

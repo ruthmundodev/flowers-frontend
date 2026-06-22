@@ -1,0 +1,118 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Temporadas</span>
+      <div class="topbar-right">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" placeholder="Buscar por año, mes o descripción..." [(ngModel)]="busqueda" />
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="layout">
+
+        <!-- ── FORMULARIO ────────────────────────────────────── -->
+        <div class="card form-card">
+          <div class="form-header">
+            <span class="form-title">
+              <i class="ti ti-calendar"></i>
+              {{ modoEdicion ? 'Editar temporada' : 'Nueva temporada' }}
+            </span>
+          </div>
+
+          <div class="form-body">
+            <div class="field-error" *ngIf="errorForm">{{ errorForm }}</div>
+
+            <div class="field">
+              <label class="field-label">Año <span class="req">*</span></label>
+              <input class="field-input" type="number" placeholder="2026"
+                     [(ngModel)]="form.year" min="2000" />
+            </div>
+
+            <div class="field">
+              <label class="field-label">Mes <span class="req">*</span></label>
+              <select class="field-input" [(ngModel)]="form.mes">
+                <option [ngValue]="null" disabled>Selecciona un mes</option>
+                <option *ngFor="let m of meses; let i = index" [ngValue]="i + 1">{{ m }}</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Descripción</label>
+              <textarea class="field-input field-textarea" rows="3"
+                        placeholder="Notas de la temporada..."
+                        [(ngModel)]="form.descripcion"></textarea>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn-light" *ngIf="modoEdicion" (click)="cancelar()" [disabled]="guardando">
+              Cancelar
+            </button>
+            <button class="btn-new" (click)="guardar()" [disabled]="guardando">
+              <i class="ti ti-check"></i>
+              {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Guardar') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- ── TABLA ─────────────────────────────────────────── -->
+        <div class="table-section">
+          <div class="sec-header">
+            <span class="sec-title">Todas las temporadas</span>
+          </div>
+
+          <div class="state-msg" *ngIf="cargando">Cargando...</div>
+          <div class="state-msg state-msg--error" *ngIf="error">Error al cargar datos.</div>
+
+          <div class="card" *ngIf="!cargando && !error">
+            <div class="table-wrap">
+              <table class="inv-table">
+                <thead>
+                  <tr>
+                    <th style="width:90px">Año</th>
+                    <th style="width:120px">Mes</th>
+                    <th>Descripción</th>
+                    <th style="width:90px">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let t of temporadasFiltradas"
+                      (click)="seleccionar(t)"
+                      [class.row-active]="editandoId === t.id">
+                    <td class="year-cell">{{ t.year }}</td>
+                    <td>
+                      <span class="mes-badge">{{ nombreMes(t.mes) }}</span>
+                    </td>
+                    <td class="text-muted desc-cell">{{ t.descripcion || '—' }}</td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-action btn-action--edit" (click)="seleccionar(t)" title="Editar">
+                          <i class="ti ti-pencil"></i>
+                        </button>
+                        <button class="btn-action btn-action--del" (click)="eliminar(t, $event)" title="Eliminar">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="temporadasFiltradas.length === 0">
+                    <td colspan="4" class="empty-row">Sin temporadas registradas</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>

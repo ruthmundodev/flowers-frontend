@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { InventarioService } from '../../services/services/inventario';
+import { InventarioItem } from '../../interfaces/inventario.interfaces';
 
 export interface Semilla {
   icono: string;
@@ -22,18 +24,81 @@ export interface Semilla {
   templateUrl: './inventario.html',
   styleUrl: './inventario.scss',
 })
-export class Inventario {
+export class Inventario implements OnInit {
 
   busqueda = '';
+  cargando = true;
+  error = false;
+  semillas: Semilla[] = [];
 
-  semillas: Semilla[] = [
-    { icono: '🌽', iconoBg: '#EAF3DE', nombre: 'Maíz criollo blanco',   descripcion: 'Heirloom · Local',       tipo: 'Grano',    stock: 62,  nivel: 62, ultimaSiembra: '12 ene', estado: 'Normal'      },
-    { icono: '🌶️', iconoBg: '#FAEEDA', nombre: 'Chile pimiento rojo',    descripcion: 'Híbrido F1 · Importado', tipo: 'Hortaliza', stock: 28,  nivel: 28, ultimaSiembra: '5 feb',  estado: 'Moderado'    },
-    { icono: '🫘', iconoBg: '#EAF3DE', nombre: 'Frijol negro criollo',   descripcion: 'Heirloom · Local',       tipo: 'Legumbre',  stock: 145, nivel: 90, ultimaSiembra: '20 ene', estado: 'Normal'      },
-    { icono: '🍅', iconoBg: '#FCEBEB', nombre: 'Tomate manzano',         descripcion: 'Híbrido · Importado',    tipo: 'Hortaliza', stock: 6,   nivel: 6,  ultimaSiembra: '3 mar',  estado: 'Crítico'     },
-    { icono: '🥬', iconoBg: '#f0ede6', nombre: 'Lechuga romana',         descripcion: 'Híbrido · Local',        tipo: 'Hortaliza', stock: 18,  nivel: 18, ultimaSiembra: '—',      estado: 'Sin sembrar' },
-    { icono: '🥕', iconoBg: '#EAF3DE', nombre: 'Zanahoria chantenay',    descripcion: 'Híbrido · Importado',    tipo: 'Raíz',      stock: 54,  nivel: 54, ultimaSiembra: '15 feb', estado: 'Normal'      },
-  ];
+  constructor(
+    private inventarioService: InventarioService,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    this.inventarioService.listar().subscribe({
+      next: (items) => {
+        this.semillas = items.map(item => this.mapToSemilla(item));
+        this.cargando = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.error = true;
+        this.cargando = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private mapToSemilla(item: InventarioItem): Semilla {
+    const estadoMap: Record<string, Semilla['estado']> = {
+      'Alto':     'Normal',
+      'Medio':    'Moderado',
+      'Bajo':     'Crítico',
+      'Sin stock': 'Sin sembrar',
+    };
+
+    const ultimaSiembra = item.ultimaSiembra
+      ? new Date(item.ultimaSiembra).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
+      : '—';
+
+    return {
+      icono:        this.getIcono(item.variedad),
+      iconoBg:      this.getIconoBg(item.nivel),
+      nombre:       item.variedad,
+      descripcion:  item.descripcion ?? '',
+      tipo:         item.tipo ?? 'Sin tipo',
+      stock:        Number(item.stockKg),
+      nivel:        item.nivelPct ?? 0,
+      ultimaSiembra,
+      estado:       estadoMap[item.nivel] ?? 'Sin sembrar',
+    };
+  }
+
+  private getIcono(nombre: string): string {
+    const n = nombre.toLowerCase();
+    if (n.includes('maíz') || n.includes('maiz'))       return '🌽';
+    if (n.includes('chile') || n.includes('pimiento'))  return '🌶️';
+    if (n.includes('frijol'))                           return '🫘';
+    if (n.includes('tomate'))                           return '🍅';
+    if (n.includes('lechuga'))                          return '🥬';
+    if (n.includes('zanahoria'))                        return '🥕';
+    if (n.includes('papa') || n.includes('potato'))     return '🥔';
+    if (n.includes('cebolla'))                          return '🧅';
+    if (n.includes('ajo'))                              return '🧄';
+    return '🌱';
+  }
+
+  private getIconoBg(nivel: string): string {
+    const map: Record<string, string> = {
+      'Alto':     '#EAF3DE',
+      'Medio':    '#FAEEDA',
+      'Bajo':     '#FCEBEB',
+      'Sin stock': '#f0ede6',
+    };
+    return map[nivel] ?? '#EAF3DE';
+  }
 
   get semillasFiltradas(): Semilla[] {
     if (!this.busqueda) return this.semillas;
@@ -44,10 +109,13 @@ export class Inventario {
     );
   }
 
-  get totalVariedades(): number { return this.semillas.length; }
-  get kgTotales(): number { return this.semillas.reduce((acc, s) => acc + s.stock, 0); }
-  get stockCritico(): number { return this.semillas.filter(s => s.estado === 'Crítico').length; }
-  get reasastoPendiente(): number { return 1; }
+  get totalVariedades(): number  { return this.semillas.length; }
+  get conStockActivo(): number   { return this.semillas.filter(s => s.stock > 0).length; }
+  get kgTotales(): number        { return Math.round(this.semillas.reduce((acc, s) => acc + s.stock, 0)); }
+  get stockCritico(): number     { return this.semillas.filter(s => s.estado === 'Crítico').length; }
+  get reasastoPendiente(): number {
+    return this.semillas.filter(s => s.estado === 'Crítico' || s.estado === 'Sin sembrar').length;
+  }
 
   badgeClass(estado: string): string {
     const map: Record<string, string> = {
