@@ -2,6 +2,9 @@
   <div class="sidebar-brand">
     <div class="brand-dot"></div>
     <span class="brand-name">SembraApp</span>
+    <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
+      <i class="ti ti-logout"></i>
+    </button>
   </div>
 
   <nav class="sidebar-nav">
@@ -36,7 +39,7 @@
 
     <div class="nav-group-label">Reportes</div>
     <a class="nav-item" routerLink="/rendimientos" routerLinkActive="active">
-      <i class="ti ti-chart-bar"></i>
+      <i class="ti ti-chart-line"></i>
       <span>Rendimientos</span>
     </a>
     <a class="nav-item" routerLink="/parcelas" routerLinkActive="active">

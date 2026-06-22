@@ -4,6 +4,7 @@ import { Dashboard } from './dashboard/dashboard';
 import { Inventario } from './inventario/inventario';
 import { Quimico } from './quimico/quimico';
 import { Temporada } from './temporada/temporada';
+import { Rendimientos } from './rendimientos/rendimientos';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -12,4 +13,5 @@ export const routes: Routes = [
   { path: 'inventario', component: Inventario },
   { path: 'quimico', component: Quimico },
   { path: 'temporada', component: Temporada },
+  { path: 'rendimientos', component: Rendimientos },
 ];

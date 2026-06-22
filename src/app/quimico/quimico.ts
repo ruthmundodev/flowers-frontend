@@ -7,6 +7,7 @@ import { Sidebar } from '../shared/sidebar/sidebar';
 import { QuimicoService } from '../../services/services/quimico';
 import { QuimicoRequest, QuimicoResponse } from '../../interfaces/quimico.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
+import { NotificacionService } from '../../services/services/notificacion';
 
 @Component({
   selector: 'app-quimico',
@@ -34,6 +35,7 @@ export class Quimico implements OnInit {
   constructor(
     private quimicoService: QuimicoService,
     private cdr: ChangeDetectorRef,
+    private notificacion: NotificacionService,
   ) {}
 
   ngOnInit(): void {
@@ -139,11 +141,13 @@ export class Quimico implements OnInit {
         }
         this.guardando    = false;
         this.modalVisible = false;
+        this.notificacion.exito(this.modoEdicion ? 'Químico actualizado correctamente' : 'Químico guardado correctamente');
         this.cdr.markForCheck();
       },
       error: () => {
         this.errorModal = 'Error al guardar. Intenta de nuevo.';
         this.guardando  = false;
+        this.notificacion.error('Error al guardar el químico');
         this.cdr.markForCheck();
       },
     });
@@ -156,9 +160,10 @@ export class Quimico implements OnInit {
     this.quimicoService.eliminar(q.id).subscribe({
       next: () => {
         this.quimicos = this.quimicos.filter(r => r.id !== q.id);
+        this.notificacion.exito('Químico eliminado correctamente');
         this.cdr.markForCheck();
       },
-      error: () => alert('No se pudo eliminar el registro.'),
+      error: () => this.notificacion.error('No se pudo eliminar el registro'),
     });
   }
 

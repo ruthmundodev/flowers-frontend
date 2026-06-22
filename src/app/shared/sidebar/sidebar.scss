@@ -33,6 +33,27 @@
   font-weight: 500;
   color: #e8f5e8;
   letter-spacing: 0.02em;
+  flex: 1;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #7ec47e;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+
+  i { font-size: 18px; }
+
+  &:hover {
+    background: #243d26;
+    color: #e8f5e8;
+  }
 }
 
 .sidebar-nav {

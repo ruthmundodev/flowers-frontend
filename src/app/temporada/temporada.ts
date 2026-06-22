@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../shared/sidebar/sidebar';
 import { TemporadaService } from '../../services/services/temporada';
 import { TemporadaRequest, TemporadaResponse } from '../../interfaces/temporada.interfaces';
+import { NotificacionService } from '../../services/services/notificacion';
 
 @Component({
   selector: 'app-temporada',
@@ -35,6 +36,7 @@ export class Temporada implements OnInit {
   constructor(
     private temporadaService: TemporadaService,
     private cdr: ChangeDetectorRef,
+    private notificacion: NotificacionService,
   ) {}
 
   ngOnInit(): void {
@@ -101,20 +103,24 @@ export class Temporada implements OnInit {
       ? this.temporadaService.actualizar(this.editandoId!, this.form)
       : this.temporadaService.guardar(this.form);
 
+    const editando = this.modoEdicion;
+
     op$.subscribe({
       next: (res) => {
-        if (this.modoEdicion) {
+        if (editando) {
           this.temporadas = this.temporadas.map(t => t.id === res.id ? res : t);
         } else {
           this.temporadas = [...this.temporadas, res];
         }
         this.guardando = false;
         this.cancelar();
+        this.notificacion.exito(editando ? 'Temporada actualizada correctamente' : 'Temporada guardada correctamente');
         this.cdr.markForCheck();
       },
       error: () => {
         this.errorForm = 'Error al guardar. Intenta de nuevo.';
         this.guardando = false;
+        this.notificacion.error('Error al guardar la temporada');
         this.cdr.markForCheck();
       },
     });
@@ -129,9 +135,10 @@ export class Temporada implements OnInit {
       next: () => {
         this.temporadas = this.temporadas.filter(r => r.id !== t.id);
         if (this.editandoId === t.id) this.cancelar();
+        this.notificacion.exito('Temporada eliminada correctamente');
         this.cdr.markForCheck();
       },
-      error: () => alert('No se pudo eliminar la temporada.'),
+      error: () => this.notificacion.error('No se pudo eliminar la temporada'),
     });
   }
 

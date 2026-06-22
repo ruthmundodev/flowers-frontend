@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../shared/sidebar/sidebar';
 import { InventarioService } from '../../services/services/inventario';
 import { InventarioItem } from '../../interfaces/inventario.interfaces';
+import { NotificacionService } from '../../services/services/notificacion';
 
 export interface Semilla {
   icono: string;
@@ -34,6 +35,7 @@ export class Inventario implements OnInit {
   constructor(
     private inventarioService: InventarioService,
     private cdr: ChangeDetectorRef,
+    private notificacion: NotificacionService,
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +48,7 @@ export class Inventario implements OnInit {
       error: () => {
         this.error = true;
         this.cargando = false;
+        this.notificacion.error('Error al cargar el inventario');
         this.cdr.markForCheck();
       }
     });

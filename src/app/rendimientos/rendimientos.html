@@ -1,0 +1,128 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Rendimientos</span>
+    </div>
+
+    <div class="content">
+
+      <!-- KPI CARDS -->
+      <div class="kpi-row">
+        <div class="kpi-card kpi-card--green">
+          <div class="kpi-label"><i class="ti ti-chart-line"></i> Registros</div>
+          <div class="kpi-val">{{ totalRegistros }}</div>
+          <div class="kpi-sub">Rendimientos registrados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i class="ti ti-scale"></i> Total kg</div>
+          <div class="kpi-val">{{ totalKg | number:'1.0-2' }}</div>
+          <div class="kpi-sub">Rendimiento acumulado</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label"><i class="ti ti-layout-grid"></i> Total bancos</div>
+          <div class="kpi-val">{{ totalBancos }}</div>
+          <div class="kpi-sub">Bancos contabilizados</div>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN SUPERIOR: FORMULARIO ─────────────────────── -->
+      <div class="card form-card">
+        <div class="form-header">
+          <span class="form-title">
+            <i class="ti ti-chart-line"></i>
+            {{ modoEdicion ? 'Editar rendimiento' : 'Registrar rendimiento' }}
+          </span>
+        </div>
+
+        <div class="form-body">
+          <div class="field-error" *ngIf="errorForm">{{ errorForm }}</div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label">Variedad <span class="req">*</span></label>
+              <select class="field-input" [(ngModel)]="form.variedadId">
+                <option [ngValue]="null" disabled>Selecciona una variedad</option>
+                <option *ngFor="let v of variedades" [ngValue]="v.id">{{ v.nombre }}</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Número de bancos <span class="req">*</span></label>
+              <input class="field-input" type="number" min="0" placeholder="0"
+                     [(ngModel)]="form.numeroBancos" />
+            </div>
+
+            <div class="field">
+              <label class="field-label">Rendimiento total (kg) <span class="req">*</span></label>
+              <input class="field-input" type="number" min="0" step="0.01" placeholder="0.00"
+                     [(ngModel)]="form.rendimientoTotal" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button class="btn-light" *ngIf="modoEdicion" (click)="limpiar()" [disabled]="guardando">
+            Cancelar
+          </button>
+          <button class="btn-new" (click)="guardar()" [disabled]="guardando">
+            <i class="ti ti-check"></i>
+            {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Guardar') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN INFERIOR: HISTORIAL ──────────────────────── -->
+      <div class="sec-header">
+        <span class="sec-title">Historial de rendimientos</span>
+      </div>
+
+      <div class="state-msg" *ngIf="cargando">Cargando...</div>
+      <div class="state-msg state-msg--error" *ngIf="error">Error al cargar datos.</div>
+
+      <div class="card" *ngIf="!cargando && !error">
+        <div class="table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Variedad</th>
+                <th style="width:160px">Número de bancos</th>
+                <th style="width:200px">Rendimiento total (kg)</th>
+                <th style="width:100px">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of rendimientos" [class.row-active]="editandoId === r.id">
+                <td>
+                  <div class="seed-name-cell">
+                    <div class="seed-icon"><i class="ti ti-plant-2"></i></div>
+                    <span class="seed-title">{{ r.nombreVariedad ?? '—' }}</span>
+                  </div>
+                </td>
+                <td class="text-muted">{{ r.numeroBancos }}</td>
+                <td class="stock-val">{{ r.rendimientoTotal | number:'1.0-2' }} kg</td>
+                <td>
+                  <div class="action-btns">
+                    <button class="btn-action btn-action--edit" (click)="editar(r)" title="Editar">
+                      <i class="ti ti-pencil"></i>
+                    </button>
+                    <button class="btn-action btn-action--del" (click)="eliminar(r)" title="Eliminar">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="rendimientos.length === 0">
+                <td colspan="4" class="empty-row">No hay rendimientos registrados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
