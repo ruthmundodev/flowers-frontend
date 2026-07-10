@@ -40,4 +40,47 @@ export class Auth {
     const data = localStorage.getItem('usuario');
     return data ? JSON.parse(data) : null;
   }
+
+  /**
+   * Decodifica el payload (parte central) de un JWT sin librerías externas.
+   * Maneja base64url y caracteres UTF-8 (nombres con acentos).
+   */
+  decodeToken(): Record<string, any> | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    const partes = token.split('.');
+    if (partes.length < 2) return null;
+
+    try {
+      const base64 = partes[1].replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(''),
+      );
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Nombre a mostrar del usuario autenticado.
+   * Orden de preferencia: claim `nombre`/`name` del JWT → `nombreCompleto`
+   * de la sesión guardada → `sub` del JWT (correo) → fallback "Usuario".
+   */
+  getNombreUsuario(): string {
+    const payload = this.decodeToken();
+    const nombreClaim = payload?.['nombre'] || payload?.['name'];
+    if (nombreClaim) return String(nombreClaim);
+
+    const nombreSesion = this.getUsuario()?.nombreCompleto;
+    if (nombreSesion) return nombreSesion;
+
+    if (payload?.['sub']) return String(payload['sub']);
+
+    return 'Usuario';
+  }
 }

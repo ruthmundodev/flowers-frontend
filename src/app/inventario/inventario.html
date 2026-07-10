@@ -13,7 +13,7 @@
           <input type="text" placeholder="Buscar semilla..." [(ngModel)]="busqueda" />
         </div>
         <button class="btn-light"><i class="ti ti-filter"></i> Filtrar</button>
-        <button class="btn-new"><i class="ti ti-plus"></i> Agregar semilla</button>
+        <button class="btn-new" (click)="abrirModal()"><i class="ti ti-plus"></i> Agregar variedad</button>
       </div>
     </div>
 
@@ -93,4 +93,69 @@
 
     </div>
   </main>
+
+  <!-- MODAL: Agregar variedad -->
+  <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title"><i class="ti ti-plant-2"></i> Agregar variedad</span>
+        <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field form-field--full">
+            <label>Nombre <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="form.nombre" placeholder="Ej. Rosa Freedom" />
+          </div>
+
+          <div class="form-field">
+            <label>Número bass <span class="req">*</span></label>
+            <input type="number" min="0" [(ngModel)]="form.numeroBass" placeholder="0" />
+          </div>
+
+          <div class="form-field">
+            <label>Invernadero <span class="req">*</span></label>
+            <select [(ngModel)]="form.invernaderoId">
+              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
+                Invernadero #{{ inv.numero }} — {{ inv.nombreCultivo }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Fecha de inicio <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.fechaInicio" />
+          </div>
+
+          <div class="form-field">
+            <label>Fecha de poda</label>
+            <input type="date" [(ngModel)]="form.fechaPoda" />
+          </div>
+
+          <div class="form-field form-field--full">
+            <label>Parental</label>
+            <input type="text" [(ngModel)]="form.parental" placeholder="Opcional" />
+          </div>
+
+          <div class="form-field form-field--full">
+            <label>Descripción</label>
+            <textarea rows="2" [(ngModel)]="form.descripcion" placeholder="Opcional"></textarea>
+          </div>
+        </div>
+
+        <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
+        <button class="btn-new" (click)="guardarVariedad()" [disabled]="guardando">
+          <i class="ti ti-check"></i> {{ guardando ? 'Guardando…' : 'Guardar variedad' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

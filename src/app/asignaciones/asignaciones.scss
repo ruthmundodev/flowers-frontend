@@ -1,0 +1,163 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  background: #f0ede6;
+}
+
+// ── Shell ─────────────────────────────────────────────────────
+.app-shell { display: flex; min-height: 100vh; width: 100%; }
+
+.main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Topbar ────────────────────────────────────────────────────
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid #e8e3d8;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title { font-size: 15px; font-weight: 500; color: #1a1a18; flex: 1; }
+
+// ── Content ───────────────────────────────────────────────────
+.content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e8e3d8;
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2e1c;
+  margin-bottom: 16px;
+
+  i { font-size: 18px; }
+}
+
+// ── Form ──────────────────────────────────────────────────────
+.form-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 240px;
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+  }
+
+  select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid #ddd9cf;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus { border-color: #1e3320; }
+  }
+}
+
+.btn-new {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #1e3320;
+  color: #b8d8b8;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  i { font-size: 14px; }
+  &:hover { background: #2a4a2e; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ── Lista de asignaciones ─────────────────────────────────────
+.asig-list {
+  list-style: none;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #f5f3ee;
+    border: 1px solid #ece8df;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #333;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      i { font-size: 16px; color: #1e3320; }
+    }
+  }
+}
+
+.btn-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c0392b;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+
+  &:hover { background: #fceaea; }
+}
+
+.empty {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #888;
+}

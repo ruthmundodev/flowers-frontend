@@ -6,6 +6,10 @@ import { Sidebar } from '../shared/sidebar/sidebar';
 import { InventarioService } from '../../services/services/inventario';
 import { InventarioItem } from '../../interfaces/inventario.interfaces';
 import { NotificacionService } from '../../services/services/notificacion';
+import { VariedadService } from '../../services/services/variedad';
+import { InvernaderoService } from '../../services/services/invernadero';
+import { VariedadRequest } from '../../interfaces/variedad.interfaces';
+import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
 
 export interface Semilla {
   icono: string;
@@ -32,13 +36,27 @@ export class Inventario implements OnInit {
   error = false;
   semillas: Semilla[] = [];
 
+  // ── Modal "Agregar variedad" ────────────────────────────────
+  mostrarModal = false;
+  guardando = false;
+  errorForm = '';
+  invernaderos: InvernaderoResponse[] = [];
+  form: VariedadRequest = this.formVacio();
+
   constructor(
     private inventarioService: InventarioService,
+    private variedadService: VariedadService,
+    private invernaderoService: InvernaderoService,
     private cdr: ChangeDetectorRef,
     private notificacion: NotificacionService,
   ) {}
 
   ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.cargando = true;
     this.inventarioService.listar().subscribe({
       next: (items) => {
         this.semillas = items.map(item => this.mapToSemilla(item));
@@ -52,6 +70,66 @@ export class Inventario implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  // ── Modal ───────────────────────────────────────────────────
+  abrirModal(): void {
+    this.form = this.formVacio();
+    this.errorForm = '';
+    this.mostrarModal = true;
+
+    if (this.invernaderos.length === 0) {
+      this.invernaderoService.listar().subscribe({
+        next: (data) => {
+          this.invernaderos = data;
+          this.cdr.markForCheck();
+        },
+        error: () => this.notificacion.error('No se pudieron cargar los invernaderos'),
+      });
+    }
+  }
+
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.errorForm = '';
+  }
+
+  guardarVariedad(): void {
+    if (!this.form.nombre?.trim() || this.form.numeroBass == null ||
+        !this.form.fechaInicio || this.form.invernaderoId == null) {
+      this.errorForm = 'Nombre, número bass, fecha de inicio e invernadero son obligatorios.';
+      return;
+    }
+
+    this.guardando = true;
+    this.errorForm = '';
+
+    this.variedadService.guardar(this.form).subscribe({
+      next: () => {
+        this.guardando = false;
+        this.cerrarModal();
+        this.notificacion.exito('Variedad agregada correctamente');
+        this.cargar();
+      },
+      error: () => {
+        this.errorForm = 'Error al guardar. Intenta de nuevo.';
+        this.guardando = false;
+        this.notificacion.error('Error al guardar la variedad');
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private formVacio(): VariedadRequest {
+    return {
+      nombre: '',
+      descripcion: '',
+      numeroBass: null,
+      fechaInicio: null,
+      fechaPoda: null,
+      invernaderoId: null,
+      parental: '',
+    };
   }
 
   private mapToSemilla(item: InventarioItem): Semilla {

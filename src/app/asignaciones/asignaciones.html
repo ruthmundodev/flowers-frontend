@@ -1,0 +1,81 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Asignación de invernaderos</span>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <div class="card">
+        <div class="card-head">
+          <i class="ti ti-user-cog"></i>
+          <span>Asignar invernaderos a un supervisor</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label>Supervisor</label>
+            <select [(ngModel)]="supervisorId" (ngModelChange)="seleccionarSupervisor()">
+              <option [ngValue]="null" disabled>Selecciona un supervisor…</option>
+              <option *ngFor="let s of supervisores" [ngValue]="s.id">
+                {{ s.nombreCompleto }} ({{ s.correoElectronico }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <p class="empty" *ngIf="!cargando && supervisores.length === 0">
+          No hay usuarios con rol Supervisor.
+        </p>
+      </div>
+
+      <!-- Asignaciones del supervisor seleccionado -->
+      <div class="card" *ngIf="supervisorId != null">
+        <div class="card-head">
+          <i class="ti ti-plant"></i>
+          <span>Invernaderos asignados</span>
+        </div>
+
+        <!-- Agregar -->
+        <div class="form-row">
+          <div class="form-field">
+            <label>Agregar invernadero</label>
+            <select [(ngModel)]="invernaderoSeleccionado">
+              <option [ngValue]="null" disabled>Selecciona un invernadero…</option>
+              <option *ngFor="let inv of invernaderosDisponibles" [ngValue]="inv.id">
+                Invernadero #{{ inv.numero }} — {{ inv.nombreCultivo }}
+              </option>
+            </select>
+          </div>
+          <button class="btn-new" (click)="asignar()"
+                  [disabled]="guardando || invernaderoSeleccionado == null">
+            <i class="ti ti-plus"></i> Asignar
+          </button>
+        </div>
+
+        <!-- Lista -->
+        <ul class="asig-list" *ngIf="asignaciones.length > 0; else sinAsig">
+          <li *ngFor="let a of asignaciones">
+            <span>
+              <i class="ti ti-building-warehouse"></i>
+              Invernadero #{{ a.invernaderoNumero }} — {{ a.invernaderoNombreCultivo }}
+            </span>
+            <button class="btn-del" (click)="quitar(a)" aria-label="Quitar">
+              <i class="ti ti-trash"></i>
+            </button>
+          </li>
+        </ul>
+
+        <ng-template #sinAsig>
+          <p class="empty">Este supervisor no tiene invernaderos asignados.</p>
+        </ng-template>
+      </div>
+
+    </div>
+  </main>
+</div>

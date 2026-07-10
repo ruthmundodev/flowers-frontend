@@ -1,7 +1,7 @@
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-dot"></div>
-    <span class="brand-name">SembraApp</span>
+    <span class="brand-name" [title]="nombreUsuario">{{ nombreUsuario }}</span>
     <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
       <i class="ti ti-logout"></i>
     </button>
@@ -50,6 +50,14 @@
       <i class="ti ti-file-export"></i>
       <span>Exportar</span>
     </a>
+
+    <ng-container *ngIf="esAdmin">
+      <div class="nav-group-label">Administración</div>
+      <a class="nav-item" routerLink="/asignaciones" routerLinkActive="active">
+        <i class="ti ti-user-cog"></i>
+        <span>Asignaciones</span>
+      </a>
+    </ng-container>
   </nav>
 
   <div class="sidebar-footer">
