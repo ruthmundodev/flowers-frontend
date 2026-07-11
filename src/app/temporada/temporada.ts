@@ -6,10 +6,11 @@ import { Sidebar } from '../shared/sidebar/sidebar';
 import { TemporadaService } from '../../services/services/temporada';
 import { TemporadaRequest, TemporadaResponse } from '../../interfaces/temporada.interfaces';
 import { NotificacionService } from '../../services/services/notificacion';
+import { PuedeDirective } from '../../directives/puede.directive';
 
 @Component({
   selector: 'app-temporada',
-  imports: [CommonModule, RouterModule, FormsModule, Sidebar],
+  imports: [CommonModule, RouterModule, FormsModule, Sidebar, PuedeDirective],
   templateUrl: './temporada.html',
   styleUrl: './temporada.scss',
 })

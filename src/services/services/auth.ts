@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { LoginRequest, LoginResponse, UsuarioSession } from '../../interfaces/auth.interfaces';
+import { LoginRequest, LoginResponse, PermisoSession, UsuarioSession } from '../../interfaces/auth.interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +39,34 @@ export class Auth {
   getUsuario(): UsuarioSession | null {
     const data = localStorage.getItem('usuario');
     return data ? JSON.parse(data) : null;
+  }
+
+  /** True si el usuario autenticado tiene rol Administrador. */
+  esAdministrador(): boolean {
+    return this.getUsuario()?.rol?.nombre === 'Administrador';
+  }
+
+  /** Permiso del usuario para un módulo (por nombre), o null si no lo tiene. */
+  getPermiso(modulo: string): PermisoSession | null {
+    return this.getUsuario()?.permisos?.find(p => p.moduloNombre === modulo) ?? null;
+  }
+
+  /**
+   * ¿Puede el usuario ver (consultar) el módulo indicado?
+   * El Administrador siempre puede; el resto según su matriz de permisos.
+   */
+  puedeConsultar(modulo: string): boolean {
+    if (this.esAdministrador()) return true;
+    return !!this.getPermiso(modulo)?.consultar;
+  }
+
+  /**
+   * ¿Puede el usuario ejecutar `accion` sobre `modulo`?
+   * El Administrador siempre puede; el resto según su matriz de permisos.
+   */
+  puede(modulo: string, accion: 'crear' | 'consultar' | 'editar' | 'eliminar'): boolean {
+    if (this.esAdministrador()) return true;
+    return !!this.getPermiso(modulo)?.[accion];
   }
 
   /**

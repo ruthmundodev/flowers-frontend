@@ -22,23 +22,27 @@
       <i class="ti ti-basket"></i>
       <span>Cosechas</span>
     </a>
-    <a class="nav-item" routerLink="/inventario" routerLinkActive="active">
+    <a class="nav-item" routerLink="/inventario" routerLinkActive="active" *ngIf="puedeVer('Inventario')">
       <i class="ti ti-box"></i>
       <span>Inventario</span>
       <span class="nav-badge nav-badge--warn">2</span>
     </a>
 
-    <a class="nav-item" routerLink="/quimico" routerLinkActive="active">
+    <a class="nav-item" routerLink="/quimico" routerLinkActive="active" *ngIf="puedeVer('Quimico')">
       <i class="ti ti-flask"></i>
       <span>Químicos</span>
     </a>
-    <a class="nav-item" routerLink="/temporada" routerLinkActive="active">
+    <a class="nav-item" routerLink="/temporada" routerLinkActive="active" *ngIf="puedeVer('Temporada')">
       <i class="ti ti-calendar"></i>
       <span>Temporadas</span>
     </a>
+    <a class="nav-item" routerLink="/anuncios" routerLinkActive="active" *ngIf="puedeVer('Anuncios')">
+      <i class="ti ti-speakerphone"></i>
+      <span>Anuncios</span>
+    </a>
 
     <div class="nav-group-label">Reportes</div>
-    <a class="nav-item" routerLink="/rendimientos" routerLinkActive="active">
+    <a class="nav-item" routerLink="/rendimientos" routerLinkActive="active" *ngIf="puedeVer('Rendimientos')">
       <i class="ti ti-chart-line"></i>
       <span>Rendimientos</span>
     </a>
@@ -53,6 +57,10 @@
 
     <ng-container *ngIf="esAdmin">
       <div class="nav-group-label">Administración</div>
+      <a class="nav-item" routerLink="/usuarios" routerLinkActive="active">
+        <i class="ti ti-users"></i>
+        <span>Usuarios</span>
+      </a>
       <a class="nav-item" routerLink="/asignaciones" routerLinkActive="active">
         <i class="ti ti-user-cog"></i>
         <span>Asignaciones</span>

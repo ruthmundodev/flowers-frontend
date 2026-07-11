@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UsuarioResponse } from '../../interfaces/usuario.interfaces';
+import { UsuarioRequest, UsuarioResponse } from '../../interfaces/usuario.interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
@@ -14,5 +14,9 @@ export class UsuarioService {
     return this.http.get<UsuarioResponse[]>(`${this.apiUrl}/listar`).pipe(
       map(data => data ?? [])
     );
+  }
+
+  guardar(request: UsuarioRequest): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(`${this.apiUrl}/guardar`, request);
   }
 }

@@ -1,0 +1,105 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Gestión de usuarios</span>
+      <div class="topbar-right">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" placeholder="Buscar usuario..." [(ngModel)]="busqueda" />
+        </div>
+        <button class="btn-new" (click)="abrirModal()">
+          <i class="ti ti-user-plus"></i> Nuevo usuario
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <p class="estado" *ngIf="cargando">Cargando usuarios…</p>
+
+      <div class="card" *ngIf="!cargando">
+        <div class="table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Código trabajador</th>
+                <th>Rol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of usuariosFiltrados">
+                <td class="strong">{{ u.nombreCompleto }}</td>
+                <td class="text-muted">{{ u.correoElectronico }}</td>
+                <td class="text-muted">{{ u.codigoTrabajador ?? '—' }}</td>
+                <td><span class="badge" [ngClass]="rolBadgeClass(u.rol?.nombre)">{{ u.rol?.nombre ?? '—' }}</span></td>
+              </tr>
+              <tr *ngIf="usuariosFiltrados.length === 0">
+                <td colspan="4" class="empty-row">Sin usuarios</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: Nuevo usuario -->
+  <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title"><i class="ti ti-user-plus"></i> Nuevo usuario</span>
+        <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-field">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.nombreCompleto" placeholder="Ej. María López" />
+        </div>
+
+        <div class="form-field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" [(ngModel)]="form.correoElectronico" placeholder="usuario@flowers.com" />
+        </div>
+
+        <div class="form-field">
+          <label>Contraseña <span class="req">*</span></label>
+          <input type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label>Rol <span class="req">*</span></label>
+            <select [(ngModel)]="form.rolId">
+              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nombre }}</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Código trabajador</label>
+            <input type="number" [(ngModel)]="form.codigoTrabajador" placeholder="Opcional" />
+          </div>
+        </div>
+
+        <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
+        <button class="btn-new" (click)="guardarUsuario()" [disabled]="guardando">
+          <i class="ti ti-check"></i> {{ guardando ? 'Creando…' : 'Crear usuario' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

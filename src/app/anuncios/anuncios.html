@@ -1,0 +1,74 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="page-title">Anuncios</span>
+      <div class="topbar-right">
+        <button class="btn-new" *ngIf="puedeCrear" (click)="abrirModal()">
+          <i class="ti ti-plus"></i> Nuevo anuncio
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <p class="estado" *ngIf="cargando">Cargando anuncios…</p>
+
+      <p class="estado" *ngIf="!cargando && anuncios.length === 0">
+        No hay anuncios publicados.
+      </p>
+
+      <div class="anuncios-grid" *ngIf="!cargando && anuncios.length > 0">
+        <article class="anuncio-card" *ngFor="let a of anuncios">
+          <img class="anuncio-img" *ngIf="a.imagen" [src]="imgSrc(a.imagen)" alt="Imagen del anuncio" />
+          <div class="anuncio-body">
+            <p class="anuncio-texto">{{ a.texto }}</p>
+          </div>
+          <button class="btn-del" *ngIf="puedeEliminar" (click)="eliminar(a)" aria-label="Eliminar">
+            <i class="ti ti-trash"></i>
+          </button>
+        </article>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: Nuevo anuncio -->
+  <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title"><i class="ti ti-speakerphone"></i> Nuevo anuncio</span>
+        <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-field">
+          <label>Texto <span class="req">*</span></label>
+          <textarea rows="3" maxlength="200" [(ngModel)]="form.texto"
+                    placeholder="Escribe el anuncio (máx. 200 caracteres)"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label>Imagen (opcional)</label>
+          <input type="file" accept="image/*" (change)="onImagenSeleccionada($event)" />
+          <img class="preview" *ngIf="form.imagen" [src]="imgSrc(form.imagen)" alt="Vista previa" />
+        </div>
+
+        <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
+        <button class="btn-new" (click)="guardarAnuncio()" [disabled]="guardando">
+          <i class="ti ti-check"></i> {{ guardando ? 'Publicando…' : 'Publicar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

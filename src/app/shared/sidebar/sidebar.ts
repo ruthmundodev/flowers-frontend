@@ -17,7 +17,12 @@ export class Sidebar {
   private auth = inject(Auth);
 
   readonly nombreUsuario = this.auth.getNombreUsuario();
-  readonly esAdmin = this.auth.getUsuario()?.rol?.nombre === 'Administrador';
+  readonly esAdmin = this.auth.esAdministrador();
+
+  /** ¿El usuario puede ver (consultar) el módulo indicado? */
+  puedeVer(modulo: string): boolean {
+    return this.auth.puedeConsultar(modulo);
+  }
 
   logout(): void {
     this.logoutService.logout();

@@ -10,6 +10,7 @@ import { VariedadService } from '../../services/services/variedad';
 import { InvernaderoService } from '../../services/services/invernadero';
 import { VariedadRequest } from '../../interfaces/variedad.interfaces';
 import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
+import { PuedeDirective } from '../../directives/puede.directive';
 
 export interface Semilla {
   icono: string;
@@ -25,7 +26,7 @@ export interface Semilla {
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, RouterModule, FormsModule, Sidebar],
+  imports: [CommonModule, RouterModule, FormsModule, Sidebar, PuedeDirective],
   templateUrl: './inventario.html',
   styleUrl: './inventario.scss',
 })

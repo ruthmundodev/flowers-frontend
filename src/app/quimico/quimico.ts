@@ -8,10 +8,11 @@ import { QuimicoService } from '../../services/services/quimico';
 import { QuimicoRequest, QuimicoResponse } from '../../interfaces/quimico.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
 import { NotificacionService } from '../../services/services/notificacion';
+import { PuedeDirective } from '../../directives/puede.directive';
 
 @Component({
   selector: 'app-quimico',
-  imports: [CommonModule, RouterModule, FormsModule, Sidebar],
+  imports: [CommonModule, RouterModule, FormsModule, Sidebar, PuedeDirective],
   templateUrl: './quimico.html',
   styleUrl: './quimico.scss',
 })

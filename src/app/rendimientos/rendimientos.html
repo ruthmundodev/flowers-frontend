@@ -68,7 +68,7 @@
           <button class="btn-light" *ngIf="modoEdicion" (click)="limpiar()" [disabled]="guardando">
             Cancelar
           </button>
-          <button class="btn-new" (click)="guardar()" [disabled]="guardando">
+          <button class="btn-new" *appPuede="'Rendimientos:crear'" (click)="guardar()" [disabled]="guardando">
             <i class="ti ti-check"></i>
             {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Guardar') }}
           </button>
@@ -106,10 +106,10 @@
                 <td class="stock-val">{{ r.rendimientoTotal | number:'1.0-2' }} kg</td>
                 <td>
                   <div class="action-btns">
-                    <button class="btn-action btn-action--edit" (click)="editar(r)" title="Editar">
+                    <button class="btn-action btn-action--edit" *appPuede="'Rendimientos:editar'" (click)="editar(r)" title="Editar">
                       <i class="ti ti-pencil"></i>
                     </button>
-                    <button class="btn-action btn-action--del" (click)="eliminar(r)" title="Eliminar">
+                    <button class="btn-action btn-action--del" *appPuede="'Rendimientos:eliminar'" (click)="eliminar(r)" title="Eliminar">
                       <i class="ti ti-trash"></i>
                     </button>
                   </div>

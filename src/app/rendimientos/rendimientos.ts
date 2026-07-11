@@ -8,10 +8,11 @@ import { RendimientoService } from '../../services/services/rendimiento';
 import { RendimientoRequest, RendimientoResponse } from '../../interfaces/rendimiento.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
 import { NotificacionService } from '../../services/services/notificacion';
+import { PuedeDirective } from '../../directives/puede.directive';
 
 @Component({
   selector: 'app-rendimientos',
-  imports: [CommonModule, RouterModule, FormsModule, Sidebar],
+  imports: [CommonModule, RouterModule, FormsModule, Sidebar, PuedeDirective],
   templateUrl: './rendimientos.html',
   styleUrl: './rendimientos.scss',
 })

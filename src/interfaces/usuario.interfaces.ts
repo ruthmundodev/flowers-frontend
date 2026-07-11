@@ -10,3 +10,11 @@ export interface UsuarioResponse {
   createdAt: string | null;
   updatedAt: string | null;
 }
+
+export interface UsuarioRequest {
+  nombreCompleto: string;
+  correoElectronico: string;
+  password: string;
+  codigoTrabajador: number | null;
+  rolId: number | null;
+}

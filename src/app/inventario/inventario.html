@@ -13,7 +13,7 @@
           <input type="text" placeholder="Buscar semilla..." [(ngModel)]="busqueda" />
         </div>
         <button class="btn-light"><i class="ti ti-filter"></i> Filtrar</button>
-        <button class="btn-new" (click)="abrirModal()"><i class="ti ti-plus"></i> Agregar variedad</button>
+        <button class="btn-new" *appPuede="'Inventario:crear'" (click)="abrirModal()"><i class="ti ti-plus"></i> Agregar variedad</button>
       </div>
     </div>
 
