@@ -29,6 +29,8 @@ export class InvernaderoService {
 
   private leerLocal(): number | null {
     const v = localStorage.getItem('invernaderoId');
-    return v ? Number(v) : null;
+    if (!v) return null;
+    const n = Number(v);
+    return isNaN(n) ? null : n;
   }
 }

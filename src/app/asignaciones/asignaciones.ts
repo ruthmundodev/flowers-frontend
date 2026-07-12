@@ -54,7 +54,7 @@ export class Asignaciones implements OnInit {
     this.usuarioService.listar().subscribe({
       next: (usuarios) => {
         this.todos = usuarios.filter(u =>
-          this.rolesGestionables.includes(u.rol?.nombre ?? ''));
+          this.rolesGestionables.includes(u.rol.nombre));
         this.cargando = false;
         this.cdr.markForCheck();
       },
@@ -83,7 +83,7 @@ export class Asignaciones implements OnInit {
   }
 
   get usuariosFiltrados(): UsuarioResponse[] {
-    return this.todos.filter(u => u.rol?.nombre === this.rolFiltro);
+    return this.todos.filter(u => u.rol.nombre === this.rolFiltro);
   }
 
   cambiarRol(rol: string): void {
