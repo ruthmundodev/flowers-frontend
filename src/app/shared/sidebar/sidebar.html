@@ -27,7 +27,6 @@
       <span>Inventario</span>
       <span class="nav-badge nav-badge--warn">2</span>
     </a>
-
     <a class="nav-item" routerLink="/quimico" routerLinkActive="active" *ngIf="puedeVer('Quimico')">
       <i class="ti ti-flask"></i>
       <span>Químicos</span>
@@ -41,38 +40,60 @@
       <span>Anuncios</span>
     </a>
 
-    <div class="nav-group-label">Reportes</div>
-    <a class="nav-item" routerLink="/rendimientos" routerLinkActive="active" *ngIf="puedeVer('Rendimientos')">
-      <i class="ti ti-chart-line"></i>
-      <span>Rendimientos</span>
-    </a>
-    <a class="nav-item" routerLink="/parcelas" routerLinkActive="active">
-      <i class="ti ti-map"></i>
-      <span>Parcelas</span>
-    </a>
-    <a class="nav-item" routerLink="/exportar" routerLinkActive="active">
-      <i class="ti ti-file-export"></i>
-      <span>Exportar</span>
-    </a>
+    <!-- Reportes — colapsable, cerrado por defecto -->
+    <button class="nav-group-label nav-group-label--toggle"
+            (click)="reportesAbierto = !reportesAbierto">
+      Reportes
+      <i class="ti ti-chevron-right nav-chevron" [class.nav-chevron--open]="reportesAbierto"></i>
+    </button>
+    <div class="nav-group-items" [class.nav-group-items--open]="reportesAbierto">
+      <a class="nav-item" routerLink="/rendimientos" routerLinkActive="active" *ngIf="puedeVer('Rendimientos')">
+        <i class="ti ti-chart-line"></i>
+        <span>Rendimientos</span>
+      </a>
+      <a class="nav-item" routerLink="/parcelas" routerLinkActive="active">
+        <i class="ti ti-map"></i>
+        <span>Parcelas</span>
+      </a>
+      <a class="nav-item" routerLink="/exportar" routerLinkActive="active">
+        <i class="ti ti-file-export"></i>
+        <span>Exportar</span>
+      </a>
+    </div>
 
+    <!-- Administración — colapsable, cerrado por defecto -->
     <ng-container *ngIf="esAdmin">
-      <div class="nav-group-label">Administración</div>
-      <a class="nav-item" routerLink="/usuarios" routerLinkActive="active">
-        <i class="ti ti-users"></i>
-        <span>Usuarios</span>
-      </a>
-      <a class="nav-item" routerLink="/asignaciones" routerLinkActive="active">
-        <i class="ti ti-user-cog"></i>
-        <span>Asignaciones</span>
-      </a>
+      <button class="nav-group-label nav-group-label--toggle"
+              (click)="adminAbierto = !adminAbierto">
+        Administración
+        <i class="ti ti-chevron-right nav-chevron" [class.nav-chevron--open]="adminAbierto"></i>
+      </button>
+      <div class="nav-group-items" [class.nav-group-items--open]="adminAbierto">
+        <a class="nav-item" routerLink="/usuarios" routerLinkActive="active">
+          <i class="ti ti-users"></i>
+          <span>Usuarios</span>
+        </a>
+        <a class="nav-item" routerLink="/asignaciones" routerLinkActive="active">
+          <i class="ti ti-user-cog"></i>
+          <span>Asignaciones</span>
+        </a>
+      </div>
     </ng-container>
   </nav>
 
   <div class="sidebar-footer">
-    <div class="farm-avatar">FR</div>
-    <div class="farm-info">
-      <div class="farm-name">Finca El Roble</div>
-      <div class="farm-season">Temporada 2025–26</div>
+    <div class="inv-select-wrapper">
+      <i class="ti ti-building-warehouse inv-icon"></i>
+      <select class="farm-select"
+              (change)="cambiarInvernadero($any($event.target).value)">
+        <option value="" [selected]="invernaderoActivoId() === null">Todos los invernaderos</option>
+        <option *ngFor="let inv of invernaderos()"
+                [value]="inv.id"
+                [selected]="invernaderoActivoId() === inv.id">
+          #{{ inv.numero }} — {{ inv.nombreCultivo }}
+        </option>
+      </select>
+      <i class="ti ti-chevron-down inv-chevron"></i>
     </div>
   </div>
 </aside>

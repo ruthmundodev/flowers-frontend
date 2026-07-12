@@ -4,4 +4,6 @@ export interface InvernaderoResponse {
   nombreCultivo: string;
   createdAt: string | null;
   cultivoId: number | null;
+  fincaId: number | null;
+  fincaNombre: string | null;
 }

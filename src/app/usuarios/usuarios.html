@@ -38,7 +38,7 @@
                 <td class="strong">{{ u.nombreCompleto }}</td>
                 <td class="text-muted">{{ u.correoElectronico }}</td>
                 <td class="text-muted">{{ u.codigoTrabajador ?? '—' }}</td>
-                <td><span class="badge" [ngClass]="rolBadgeClass(u.rol?.nombre)">{{ u.rol?.nombre ?? '—' }}</span></td>
+                <td><span class="badge" [ngClass]="rolBadgeClass(u.rol.nombre)">{{ u.rol.nombre }}</span></td>
               </tr>
               <tr *ngIf="usuariosFiltrados.length === 0">
                 <td colspan="4" class="empty-row">Sin usuarios</td>

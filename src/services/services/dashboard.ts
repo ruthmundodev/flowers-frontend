@@ -10,19 +10,23 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  getStats(): Observable<DashboardStats> {
-    return this.http.get<DashboardStats>(`${this.apiUrl}/stats`);
+  getStats(invernaderoId?: number | null): Observable<DashboardStats> {
+    return this.http.get<DashboardStats>(`${this.apiUrl}/stats${this.q(invernaderoId)}`);
   }
 
-  getCultivosActivos(): Observable<DashboardCultivo[]> {
-    return this.http.get<DashboardCultivo[]>(`${this.apiUrl}/cultivos-activos`).pipe(
+  getCultivosActivos(invernaderoId?: number | null): Observable<DashboardCultivo[]> {
+    return this.http.get<DashboardCultivo[]>(`${this.apiUrl}/cultivos-activos${this.q(invernaderoId)}`).pipe(
       map(data => data ?? [])
     );
   }
 
-  getCosechasPorMes(): Observable<CosechaMes[]> {
-    return this.http.get<CosechaMes[]>(`${this.apiUrl}/cosechas-mes`).pipe(
+  getCosechasPorMes(invernaderoId?: number | null): Observable<CosechaMes[]> {
+    return this.http.get<CosechaMes[]>(`${this.apiUrl}/cosechas-mes${this.q(invernaderoId)}`).pipe(
       map(data => data ?? [])
     );
+  }
+
+  private q(invernaderoId?: number | null): string {
+    return invernaderoId != null ? `?invernaderoId=${invernaderoId}` : '';
   }
 }

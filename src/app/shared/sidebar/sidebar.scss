@@ -60,6 +60,7 @@
   }
 }
 
+// ── Nav ───────────────────────────────────────────────────────
 .sidebar-nav {
   display: flex;
   flex-direction: column;
@@ -69,12 +70,49 @@
 
 .nav-group-label {
   font-size: 10px;
+  font-family: 'DM Sans', sans-serif;
   color: #4a7a4a;
   letter-spacing: 0.08em;
   padding: 16px 8px 6px;
   text-transform: uppercase;
+
+  // Variante colapsable
+  &--toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+
+    &:hover { color: #6aaa6a; }
+  }
 }
 
+.nav-chevron {
+  font-size: 13px;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &--open { transform: rotate(90deg); }
+}
+
+// ── Ítems colapsables ─────────────────────────────────────────
+.nav-group-items {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity    0.22s ease;
+  opacity: 0;
+
+  &--open {
+    max-height: 300px;
+    opacity: 1;
+  }
+}
+
+// ── Ítem de navegación ────────────────────────────────────────
 .nav-item {
   display: flex;
   align-items: center;
@@ -115,37 +153,58 @@
   }
 }
 
+// ── Footer — selector de invernadero ─────────────────────────
 .sidebar-footer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 8px 0;
+  padding: 14px 0 0;
   border-top: 1px solid #2a4a2c;
   margin-top: 16px;
 }
 
-.farm-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: #2a4a2e;
-  color: #7ec47e;
-  font-size: 12px;
-  font-weight: 600;
+.inv-select-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+
+  .inv-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 14px;
+    color: #5a8a5a;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .inv-chevron {
+    position: absolute;
+    right: 10px;
+    font-size: 13px;
+    color: #5a8a5a;
+    pointer-events: none;
+    transition: color 0.15s;
+  }
+
+  &:focus-within {
+    .inv-icon, .inv-chevron { color: #7ec47e; }
+  }
 }
 
-.farm-name {
+.farm-select {
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: #c8e8c8;
-}
+  background: #16281a;
+  border: 1px solid #2a4a2c;
+  border-radius: 8px;
+  padding: 8px 32px 8px 30px;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
 
-.farm-season {
-  font-size: 10px;
-  color: #4a7a4a;
-  margin-top: 1px;
+  &:hover  { border-color: #3a6a3e; background: #1a3220; }
+  &:focus  { border-color: #7ec47e; background: #1e3a22; }
+  option   { color: #1a2e1c; background: #fff; }
 }

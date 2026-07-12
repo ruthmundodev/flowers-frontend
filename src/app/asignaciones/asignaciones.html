@@ -11,31 +11,43 @@
     <!-- CONTENT -->
     <div class="content">
 
+      <!-- SELECTOR DE ROL + USUARIO -->
       <div class="card">
         <div class="card-head">
           <i class="ti ti-user-cog"></i>
-          <span>Asignar invernaderos a un supervisor</span>
+          <span>Asignar invernaderos a un usuario</span>
         </div>
 
-        <div class="form-row">
+        <!-- Tabs de rol -->
+        <div class="rol-tabs">
+          <button *ngFor="let rol of rolesGestionables"
+                  class="rol-tab"
+                  [class.active]="rolFiltro === rol"
+                  (click)="cambiarRol(rol)">
+            {{ pluralRol[rol] }}
+          </button>
+        </div>
+
+        <!-- Selector de usuario filtrado por rol -->
+        <div class="form-row" style="margin-top: 16px;">
           <div class="form-field">
-            <label>Supervisor</label>
-            <select [(ngModel)]="supervisorId" (ngModelChange)="seleccionarSupervisor()">
-              <option [ngValue]="null" disabled>Selecciona un supervisor…</option>
-              <option *ngFor="let s of supervisores" [ngValue]="s.id">
-                {{ s.nombreCompleto }} ({{ s.correoElectronico }})
+            <label>{{ pluralRol[rolFiltro] }}</label>
+            <select [(ngModel)]="usuarioSeleccionadoId" (ngModelChange)="seleccionarUsuario()">
+              <option [ngValue]="null" disabled>Selecciona un usuario…</option>
+              <option *ngFor="let u of usuariosFiltrados" [ngValue]="u.id">
+                {{ u.nombreCompleto }} ({{ u.correoElectronico }})
               </option>
             </select>
           </div>
         </div>
 
-        <p class="empty" *ngIf="!cargando && supervisores.length === 0">
-          No hay usuarios con rol Supervisor.
+        <p class="empty" *ngIf="!cargando && usuariosFiltrados.length === 0">
+          No hay usuarios con rol {{ pluralRol[rolFiltro] }}.
         </p>
       </div>
 
-      <!-- Asignaciones del supervisor seleccionado -->
-      <div class="card" *ngIf="supervisorId != null">
+      <!-- Invernaderos del usuario seleccionado -->
+      <div class="card" *ngIf="usuarioSeleccionadoId != null">
         <div class="card-head">
           <i class="ti ti-plant"></i>
           <span>Invernaderos asignados</span>
@@ -43,15 +55,28 @@
 
         <!-- Agregar -->
         <div class="form-row">
+          <!-- Filtro por finca -->
+          <div class="form-field" *ngIf="fincas.length > 1">
+            <label>Finca</label>
+            <select [(ngModel)]="fincaFiltro" (ngModelChange)="cambiarFinca($event)">
+              <option [ngValue]="null">Todas las fincas</option>
+              <option *ngFor="let f of fincas" [ngValue]="f.id">{{ f.nombre }}</option>
+            </select>
+          </div>
+
           <div class="form-field">
             <label>Agregar invernadero</label>
             <select [(ngModel)]="invernaderoSeleccionado">
               <option [ngValue]="null" disabled>Selecciona un invernadero…</option>
               <option *ngFor="let inv of invernaderosDisponibles" [ngValue]="inv.id">
                 Invernadero #{{ inv.numero }} — {{ inv.nombreCultivo }}
+                <ng-container *ngIf="fincaFiltro == null && inv.fincaNombre">
+                  &nbsp;({{ inv.fincaNombre }})
+                </ng-container>
               </option>
             </select>
           </div>
+
           <button class="btn-new" (click)="asignar()"
                   [disabled]="guardando || invernaderoSeleccionado == null">
             <i class="ti ti-plus"></i> Asignar
@@ -72,7 +97,7 @@
         </ul>
 
         <ng-template #sinAsig>
-          <p class="empty">Este supervisor no tiene invernaderos asignados.</p>
+          <p class="empty">Este usuario no tiene invernaderos asignados.</p>
         </ng-template>
       </div>
 

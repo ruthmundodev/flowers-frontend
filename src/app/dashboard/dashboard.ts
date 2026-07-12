@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Sidebar } from '../shared/sidebar/sidebar';
 import { DashboardService } from '../../services/services/dashboard';
+import { InvernaderoService } from '../../services/services/invernadero';
 import { CosechaMes, DashboardCultivo, DashboardStats } from '../../interfaces/dashboard.interfaces';
 
 @Component({
@@ -13,7 +14,7 @@ import { CosechaMes, DashboardCultivo, DashboardStats } from '../../interfaces/d
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit {
+export class Dashboard {
 
   stats: DashboardStats = {
     cultivosActivos: 0,
@@ -30,15 +31,21 @@ export class Dashboard implements OnInit {
   constructor(
     private dashboardService: DashboardService,
     private cdr: ChangeDetectorRef,
-  ) {}
+    private invernaderoService: InvernaderoService,
+  ) {
+    effect(() => {
+      const invernaderoId = this.invernaderoService.invernaderoActivoId();
+      this.cargar(invernaderoId);
+    });
+  }
 
-  ngOnInit(): void {
+  private cargar(invernaderoId: number | null): void {
     forkJoin({
-      stats:    this.dashboardService.getStats().pipe(catchError(() => of(null))),
-      cultivos: this.dashboardService.getCultivosActivos().pipe(catchError(() => of([]))),
-      cosechas: this.dashboardService.getCosechasPorMes().pipe(catchError(() => of([]))),
+      stats:    this.dashboardService.getStats(invernaderoId).pipe(catchError(() => of(null))),
+      cultivos: this.dashboardService.getCultivosActivos(invernaderoId).pipe(catchError(() => of([]))),
+      cosechas: this.dashboardService.getCosechasPorMes(invernaderoId).pipe(catchError(() => of([]))),
     }).subscribe(({ stats, cultivos, cosechas }) => {
-      if (stats) this.stats = stats;
+      this.stats = stats ?? this.stats;
       this.cultivosActivos = cultivos ?? [];
       this.cosechasMes     = cosechas ?? [];
       this.maxKg = Math.max(...this.cosechasMes.map(c => Number(c.totalKg)), 1);

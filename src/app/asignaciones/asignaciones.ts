@@ -6,9 +6,11 @@ import { Sidebar } from '../shared/sidebar/sidebar';
 import { UsuarioService } from '../../services/services/usuario';
 import { InvernaderoService } from '../../services/services/invernadero';
 import { InvernaderoUsuarioService } from '../../services/services/invernadero-usuario';
+import { FincaService } from '../../services/services/finca';
 import { NotificacionService } from '../../services/services/notificacion';
 import { UsuarioResponse } from '../../interfaces/usuario.interfaces';
 import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
+import { FincaResponse } from '../../interfaces/finca.interfaces';
 import { InvernaderoUsuarioResponse } from '../../interfaces/invernadero-usuario.interfaces';
 
 @Component({
@@ -19,12 +21,22 @@ import { InvernaderoUsuarioResponse } from '../../interfaces/invernadero-usuario
 })
 export class Asignaciones implements OnInit {
 
-  supervisores: UsuarioResponse[] = [];
+  readonly rolesGestionables = ['Supervisor', 'Trabajador', 'Sembrador'];
+  readonly pluralRol: Record<string, string> = {
+    'Supervisor': 'Supervisores',
+    'Trabajador': 'Trabajadores',
+    'Sembrador':  'Sembradores',
+  };
+  rolFiltro = 'Supervisor';
+
+  todos: UsuarioResponse[] = [];
   invernaderos: InvernaderoResponse[] = [];
+  fincas: FincaResponse[] = [];
   asignaciones: InvernaderoUsuarioResponse[] = [];
 
-  supervisorId: number | null = null;
+  usuarioSeleccionadoId: number | null = null;
   invernaderoSeleccionado: number | null = null;
+  fincaFiltro: number | null = null;
 
   cargando = true;
   guardando = false;
@@ -33,6 +45,7 @@ export class Asignaciones implements OnInit {
     private usuarioService: UsuarioService,
     private invernaderoService: InvernaderoService,
     private invUsuarioService: InvernaderoUsuarioService,
+    private fincaService: FincaService,
     private notificacion: NotificacionService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -40,13 +53,14 @@ export class Asignaciones implements OnInit {
   ngOnInit(): void {
     this.usuarioService.listar().subscribe({
       next: (usuarios) => {
-        this.supervisores = usuarios.filter(u => u.rol?.nombre === 'Supervisor');
+        this.todos = usuarios.filter(u =>
+          this.rolesGestionables.includes(u.rol?.nombre ?? ''));
         this.cargando = false;
         this.cdr.markForCheck();
       },
       error: () => {
         this.cargando = false;
-        this.notificacion.error('Error al cargar los supervisores');
+        this.notificacion.error('Error al cargar los usuarios');
         this.cdr.markForCheck();
       },
     });
@@ -58,14 +72,38 @@ export class Asignaciones implements OnInit {
       },
       error: () => this.notificacion.error('Error al cargar los invernaderos'),
     });
+
+    this.fincaService.listar().subscribe({
+      next: (data) => {
+        this.fincas = data;
+        this.cdr.markForCheck();
+      },
+      error: () => this.notificacion.error('Error al cargar las fincas'),
+    });
   }
 
-  seleccionarSupervisor(): void {
+  get usuariosFiltrados(): UsuarioResponse[] {
+    return this.todos.filter(u => u.rol?.nombre === this.rolFiltro);
+  }
+
+  cambiarRol(rol: string): void {
+    this.rolFiltro = rol;
+    this.usuarioSeleccionadoId = null;
     this.asignaciones = [];
     this.invernaderoSeleccionado = null;
-    if (this.supervisorId == null) return;
+  }
 
-    this.invUsuarioService.listarPorUsuario(this.supervisorId).subscribe({
+  cambiarFinca(id: number | null): void {
+    this.fincaFiltro = id;
+    this.invernaderoSeleccionado = null;
+  }
+
+  seleccionarUsuario(): void {
+    this.asignaciones = [];
+    this.invernaderoSeleccionado = null;
+    if (this.usuarioSeleccionadoId == null) return;
+
+    this.invUsuarioService.listarPorUsuario(this.usuarioSeleccionadoId).subscribe({
       next: (data) => {
         this.asignaciones = data;
         this.cdr.markForCheck();
@@ -76,18 +114,21 @@ export class Asignaciones implements OnInit {
 
   get invernaderosDisponibles(): InvernaderoResponse[] {
     const asignadosIds = new Set(this.asignaciones.map(a => a.invernaderoId));
-    return this.invernaderos.filter(inv => !asignadosIds.has(inv.id));
+    return this.invernaderos.filter(inv =>
+      !asignadosIds.has(inv.id) &&
+      (this.fincaFiltro == null || inv.fincaId === this.fincaFiltro),
+    );
   }
 
   asignar(): void {
-    if (this.supervisorId == null || this.invernaderoSeleccionado == null) {
-      this.notificacion.error('Selecciona un supervisor y un invernadero');
+    if (this.usuarioSeleccionadoId == null || this.invernaderoSeleccionado == null) {
+      this.notificacion.error('Selecciona un usuario y un invernadero');
       return;
     }
 
     this.guardando = true;
     this.invUsuarioService
-      .asignar({ usuarioId: this.supervisorId, invernaderoId: this.invernaderoSeleccionado })
+      .asignar({ usuarioId: this.usuarioSeleccionadoId, invernaderoId: this.invernaderoSeleccionado })
       .subscribe({
         next: (res) => {
           this.asignaciones = [...this.asignaciones, res];
@@ -105,7 +146,7 @@ export class Asignaciones implements OnInit {
   }
 
   quitar(a: InvernaderoUsuarioResponse): void {
-    if (!confirm(`¿Quitar el invernadero #${a.invernaderoNumero} de este supervisor?`)) return;
+    if (!confirm(`¿Quitar el invernadero #${a.invernaderoNumero} de este ${this.rolFiltro.toLowerCase()}?`)) return;
 
     this.invUsuarioService.eliminar(a.id).subscribe({
       next: () => {
