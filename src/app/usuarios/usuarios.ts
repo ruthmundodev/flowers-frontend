@@ -57,7 +57,7 @@ export class Usuarios implements OnInit {
     this.rolService.listar().subscribe({
       next: (data) => {
         this.roles = data;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => this.notificacion.error('Error al cargar los roles'),
     });

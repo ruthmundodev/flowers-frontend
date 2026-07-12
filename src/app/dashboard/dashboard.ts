@@ -1,8 +1,10 @@
-import { Component, ChangeDetectorRef, effect } from '@angular/core';
+import { Component, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { Sidebar } from '../shared/sidebar/sidebar';
 import { DashboardService } from '../../services/services/dashboard';
 import { InvernaderoService } from '../../services/services/invernadero';
@@ -28,29 +30,29 @@ export class Dashboard {
   cosechasMes: CosechaMes[] = [];
   maxKg = 1;
 
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private dashboardService: DashboardService,
     private cdr: ChangeDetectorRef,
     private invernaderoService: InvernaderoService,
   ) {
-    effect(() => {
-      const invernaderoId = this.invernaderoService.invernaderoActivoId();
-      this.cargar(invernaderoId);
-    });
-  }
-
-  private cargar(invernaderoId: number | null): void {
-    forkJoin({
-      stats:    this.dashboardService.getStats(invernaderoId).pipe(catchError(() => of(null))),
-      cultivos: this.dashboardService.getCultivosActivos(invernaderoId).pipe(catchError(() => of([]))),
-      cosechas: this.dashboardService.getCosechasPorMes(invernaderoId).pipe(catchError(() => of([]))),
-    }).subscribe(({ stats, cultivos, cosechas }) => {
-      this.stats = stats ?? this.stats;
-      this.cultivosActivos = cultivos ?? [];
-      this.cosechasMes     = cosechas ?? [];
-      this.maxKg = Math.max(...this.cosechasMes.map(c => Number(c.totalKg)), 1);
-      this.cdr.markForCheck();
-    });
+    toObservable(this.invernaderoService.invernaderoActivoId)
+      .pipe(
+        switchMap(id => forkJoin({
+          stats:    this.dashboardService.getStats(id).pipe(catchError(() => of(null))),
+          cultivos: this.dashboardService.getCultivosActivos(id).pipe(catchError(() => of([]))),
+          cosechas: this.dashboardService.getCosechasPorMes(id).pipe(catchError(() => of([]))),
+        })),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(({ stats, cultivos, cosechas }) => {
+        this.stats           = stats ?? this.stats;
+        this.cultivosActivos = cultivos ?? [];
+        this.cosechasMes     = cosechas ?? [];
+        this.maxKg = Math.max(...this.cosechasMes.map(c => Number(c.totalKg)), 1);
+        this.cdr.markForCheck();
+      });
   }
 
   getIcono(nombre: string): string {
