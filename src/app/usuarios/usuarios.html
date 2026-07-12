@@ -29,19 +29,36 @@
               <tr>
                 <th>Nombre</th>
                 <th>Correo</th>
-                <th>Código trabajador</th>
+                <th>Código</th>
                 <th>Rol</th>
+                <th>Estado</th>
+                <th class="col-acciones">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let u of usuariosFiltrados">
+              <tr *ngFor="let u of usuariosFiltrados" [class.row--inactivo]="!u.activo">
                 <td class="strong">{{ u.nombreCompleto }}</td>
                 <td class="text-muted">{{ u.correoElectronico }}</td>
                 <td class="text-muted">{{ u.codigoTrabajador ?? '—' }}</td>
                 <td><span class="badge" [ngClass]="rolBadgeClass(u.rol.nombre)">{{ u.rol.nombre }}</span></td>
+                <td>
+                  <mat-slide-toggle
+                    [checked]="u.activo"
+                    [disabled]="toggling.has(u.id)"
+                    (change)="toggleActivo(u)"
+                    color="primary" />
+                </td>
+                <td class="acciones">
+                  <button class="btn-icon" title="Editar rol" (click)="abrirModalRol(u)">
+                    <i class="ti ti-pencil"></i>
+                  </button>
+                  <button class="btn-icon" title="Resetear contraseña" (click)="abrirModalPassword(u)">
+                    <i class="ti ti-key"></i>
+                  </button>
+                </td>
               </tr>
               <tr *ngIf="usuariosFiltrados.length === 0">
-                <td colspan="4" class="empty-row">Sin usuarios</td>
+                <td colspan="6" class="empty-row">Sin usuarios</td>
               </tr>
             </tbody>
           </table>
@@ -98,6 +115,63 @@
         <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
         <button class="btn-new" (click)="guardarUsuario()" [disabled]="guardando">
           <i class="ti ti-check"></i> {{ guardando ? 'Creando…' : 'Crear usuario' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar rol -->
+  <div class="modal-overlay" *ngIf="mostrarModalRol" (click)="cerrarModalRol()">
+    <div class="modal-card modal-card--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title"><i class="ti ti-pencil"></i> Editar rol</span>
+        <button class="modal-close" (click)="cerrarModalRol()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-subtitle">{{ usuarioEditandoRol?.nombreCompleto }}</p>
+        <div class="form-field">
+          <label>Nuevo rol <span class="req">*</span></label>
+          <select [(ngModel)]="rolIdNuevo">
+            <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nombre }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModalRol()" [disabled]="guardandoRol">Cancelar</button>
+        <button class="btn-new" (click)="guardarRol()" [disabled]="guardandoRol || rolIdNuevo == null">
+          <i class="ti ti-check"></i> {{ guardandoRol ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Resetear contraseña -->
+  <div class="modal-overlay" *ngIf="mostrarModalPassword" (click)="cerrarModalPassword()">
+    <div class="modal-card modal-card--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title"><i class="ti ti-key"></i> Restablecer contraseña</span>
+        <button class="modal-close" (click)="cerrarModalPassword()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-subtitle">{{ usuarioPassword?.nombreCompleto }}</p>
+        <div class="form-field">
+          <label>Nueva contraseña <span class="req">*</span></label>
+          <input type="password" [(ngModel)]="nuevaPassword" placeholder="Mínimo 6 caracteres" />
+        </div>
+        <p class="form-error" *ngIf="errorPassword">{{ errorPassword }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModalPassword()" [disabled]="guardandoPassword">Cancelar</button>
+        <button class="btn-new" (click)="confirmarPassword()" [disabled]="guardandoPassword">
+          <i class="ti ti-check"></i> {{ guardandoPassword ? 'Guardando…' : 'Restablecer' }}
         </button>
       </div>
     </div>

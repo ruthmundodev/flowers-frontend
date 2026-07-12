@@ -7,6 +7,7 @@ export interface UsuarioResponse {
     id: number;
     nombre: string;
   };
+  activo: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 }

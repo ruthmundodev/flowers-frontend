@@ -21,10 +21,9 @@ import { InvernaderoUsuarioResponse } from '../../interfaces/invernadero-usuario
 })
 export class Asignaciones implements OnInit {
 
-  readonly rolesGestionables = ['Supervisor', 'Trabajador', 'Sembrador'];
+  readonly rolesGestionables = ['Supervisor', 'Sembrador'];
   readonly pluralRol: Record<string, string> = {
     'Supervisor': 'Supervisores',
-    'Trabajador': 'Trabajadores',
     'Sembrador':  'Sembradores',
   };
   rolFiltro = 'Supervisor';

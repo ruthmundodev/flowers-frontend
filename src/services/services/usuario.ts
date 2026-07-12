@@ -19,4 +19,16 @@ export class UsuarioService {
   guardar(request: UsuarioRequest): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(`${this.apiUrl}/guardar`, request);
   }
+
+  actualizarRol(id: number, rolId: number): Observable<UsuarioResponse> {
+    return this.http.put<UsuarioResponse>(`${this.apiUrl}/${id}/rol`, { rolId });
+  }
+
+  resetearPassword(id: number, nuevaPassword: string): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/password`, { nuevaPassword });
+  }
+
+  toggleActivo(id: number): Observable<UsuarioResponse> {
+    return this.http.put<UsuarioResponse>(`${this.apiUrl}/${id}/activo`, {});
+  }
 }

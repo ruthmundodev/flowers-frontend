@@ -135,6 +135,11 @@
   .strong { font-weight: 500; }
   .text-muted { color: #8a8a80; }
   .empty-row { text-align: center; color: #aaa; padding: 24px; }
+
+  .col-acciones { width: 110px; text-align: center; }
+  .acciones { text-align: center; white-space: nowrap; }
+
+  .row--inactivo td { opacity: 0.55; }
 }
 
 .badge {
@@ -147,6 +152,26 @@
   &.badge--green { background: #eaf3de; color: #3d6b1f; }
   &.badge--blue  { background: #e3edf7; color: #1f4d7a; }
   &.badge--gray  { background: #eee; color: #666; }
+}
+
+// ── Botones de acción ─────────────────────────────────────────
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ddd9cf;
+  border-radius: 7px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  margin: 0 2px;
+
+  &:hover { background: #f0ede6; border-color: #c0b8a8; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 // ── Modal ─────────────────────────────────────────────────────
@@ -204,6 +229,15 @@
 }
 
 .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+
+.modal-card--sm { max-width: 360px; }
+
+.modal-subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a2e1c;
+  margin-bottom: 2px;
+}
 
 .form-row {
   display: flex;
