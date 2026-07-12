@@ -27,9 +27,16 @@ export class Sidebar implements OnInit {
 
   reportesAbierto = false;
   adminAbierto    = false;
+  mobileOpen      = false;
+
+  private static readonly RUTAS_REPORTES = ['/rendimientos', '/parcelas', '/exportar'];
+  private static readonly RUTAS_ADMIN    = ['/usuarios', '/asignaciones'];
 
   ngOnInit(): void {
     this.invernaderoService.listar().subscribe(data => this.invernaderos.set(data));
+    const url = this.router.url;
+    this.reportesAbierto = Sidebar.RUTAS_REPORTES.some(r => url.startsWith(r));
+    this.adminAbierto    = Sidebar.RUTAS_ADMIN.some(r => url.startsWith(r));
   }
 
   puedeVer(modulo: string): boolean {

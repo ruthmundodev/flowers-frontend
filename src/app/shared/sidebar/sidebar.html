@@ -1,7 +1,20 @@
-<aside class="sidebar">
+<!-- Botón hamburguesa — solo visible en móvil -->
+<button class="hamburger-btn" (click)="mobileOpen = true" aria-label="Abrir menú">
+  <i class="ti ti-menu-2"></i>
+</button>
+
+<!-- Backdrop para cerrar el drawer -->
+<div class="sidebar-backdrop" [class.sidebar-backdrop--visible]="mobileOpen"
+     (click)="mobileOpen = false"></div>
+
+<aside class="sidebar" [class.sidebar--open]="mobileOpen">
   <div class="sidebar-brand">
     <div class="brand-dot"></div>
     <span class="brand-name" [title]="nombreUsuario">{{ nombreUsuario }}</span>
+    <button class="logout-btn close-mobile-btn" (click)="mobileOpen = false"
+            aria-label="Cerrar menú" title="Cerrar menú">
+      <i class="ti ti-x"></i>
+    </button>
     <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
       <i class="ti ti-logout"></i>
     </button>

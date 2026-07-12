@@ -57,6 +57,11 @@ app-root {
   min-height: 100vh;
 }
 
+// ── Topbar — compensar botón hamburguesa en móvil ─────────────
+@media (max-width: 640px) {
+  .topbar { padding-left: 60px !important; }
+}
+
 // ── Snackbars (NotificacionService) ───────────────────────────
 .snack-exito {
   --mdc-snackbar-container-color: #27500A;
