@@ -38,7 +38,32 @@ export class Auth {
 
   getUsuario(): UsuarioSession | null {
     const data = localStorage.getItem('usuario');
-    return data ? JSON.parse(data) : null;
+    if (!data) return null;
+    try {
+      return JSON.parse(data) as UsuarioSession;
+    } catch {
+      // JSON corrupto en localStorage → tratamos como sin sesión.
+      return null;
+    }
+  }
+
+  /**
+   * ¿La sesión guardada está completa y es usable? (P7)
+   *
+   * Una sesión con token pero sin rol —o un no-admin sin permisos— deja al
+   * usuario con el menú vacío y atascado. En ese caso la consideramos inválida
+   * para forzar un re-login limpio en lugar de mostrar una app inservible.
+   */
+  sesionValida(): boolean {
+    if (!this.getToken()) return false;
+
+    const usuario = this.getUsuario();
+    if (!usuario || !usuario.rol?.nombre) return false;
+
+    // El Administrador no depende de la matriz de permisos.
+    if (usuario.rol.nombre === 'Administrador') return true;
+
+    return Array.isArray(usuario.permisos) && usuario.permisos.length > 0;
   }
 
   /** True si el usuario autenticado tiene rol Administrador. */
