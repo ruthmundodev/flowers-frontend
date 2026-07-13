@@ -7,10 +7,11 @@ import {
   InvernaderoUsuarioRequest,
   InvernaderoUsuarioResponse,
 } from '../../interfaces/invernadero-usuario.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class InvernaderoUsuarioService {
-  private readonly apiUrl = 'http://localhost:8080/api/invernadero-usuario';
+  private readonly apiUrl = `${environment.apiUrl}/api/invernadero-usuario`;
 
   constructor(private http: HttpClient) {}
 

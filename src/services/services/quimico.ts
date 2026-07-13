@@ -4,11 +4,12 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { QuimicoRequest, QuimicoResponse } from '../../interfaces/quimico.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class QuimicoService {
-  private readonly apiUrl      = 'http://localhost:8080/api/quimico';
-  private readonly variedadUrl = 'http://localhost:8080/api/variedad';
+  private readonly apiUrl      = `${environment.apiUrl}/api/quimico`;
+  private readonly variedadUrl = `${environment.apiUrl}/api/variedad`;
 
   constructor(private http: HttpClient) {}
 

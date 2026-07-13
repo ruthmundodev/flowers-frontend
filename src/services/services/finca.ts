@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { FincaResponse } from '../../interfaces/finca.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class FincaService {
-  private readonly apiUrl = 'http://localhost:8080/api/finca';
+  private readonly apiUrl = `${environment.apiUrl}/api/finca`;
   private http = inject(HttpClient);
 
   /**

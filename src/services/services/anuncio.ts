@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AnuncioRequest, AnuncioResponse } from '../../interfaces/anuncio.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AnuncioService {
-  private readonly apiUrl = 'http://localhost:8080/api/anuncio';
+  private readonly apiUrl = `${environment.apiUrl}/api/anuncio`;
 
   constructor(private http: HttpClient) {}
 

@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { LoginRequest, LoginResponse, PermisoSession, UsuarioSession } from '../../interfaces/auth.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  readonly apiUrl = 'http://localhost:8080/api/auth';
+  readonly apiUrl = `${environment.apiUrl}/api/auth`;
 
   constructor(readonly http: HttpClient) {}
 

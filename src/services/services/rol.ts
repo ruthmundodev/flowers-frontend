@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { RolResponse } from '../../interfaces/rol.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RolService {
-  private readonly apiUrl = 'http://localhost:8080/api/roles';
+  private readonly apiUrl = `${environment.apiUrl}/api/roles`;
 
   constructor(private http: HttpClient) {}
 

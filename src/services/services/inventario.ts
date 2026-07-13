@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { InventarioItem } from '../../interfaces/inventario.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class InventarioService {
-  private readonly apiUrl = 'http://localhost:8080/api/inventario';
+  private readonly apiUrl = `${environment.apiUrl}/api/inventario`;
 
   constructor(private http: HttpClient) {}
 

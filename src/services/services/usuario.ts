@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UsuarioRequest, UsuarioResponse } from '../../interfaces/usuario.interfaces';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private readonly apiUrl = 'http://localhost:8080/api/usuarios';
+  private readonly apiUrl = `${environment.apiUrl}/api/usuarios`;
 
   constructor(private http: HttpClient) {}
 
