@@ -29,7 +29,6 @@
     <a class="nav-item" routerLink="/siembras" routerLinkActive="active">
       <i class="ti ti-seeding"></i>
       <span>Siembras</span>
-      <span class="nav-badge">3</span>
     </a>
     <a class="nav-item" routerLink="/cosechas" routerLinkActive="active">
       <i class="ti ti-basket"></i>
@@ -38,7 +37,8 @@
     <a class="nav-item" routerLink="/inventario" routerLinkActive="active" *ngIf="puedeVer('Inventario')">
       <i class="ti ti-box"></i>
       <span>Inventario</span>
-      <span class="nav-badge nav-badge--warn">2</span>
+      <span class="nav-badge nav-badge--warn" *ngIf="stockBajo() > 0"
+            [title]="stockBajo() + ' variedad(es) con stock bajo'">{{ stockBajo() }}</span>
     </a>
     <a class="nav-item" routerLink="/quimico" routerLinkActive="active" *ngIf="puedeVer('Quimico')">
       <i class="ti ti-flask"></i>

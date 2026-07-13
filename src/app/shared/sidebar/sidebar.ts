@@ -1,9 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 import { LogoutService } from '../../../services/services/logout';
 import { Auth } from '../../../services/services/auth';
 import { InvernaderoService } from '../../../services/services/invernadero';
+import { DashboardService } from '../../../services/services/dashboard';
 import { InvernaderoResponse } from '../../../interfaces/invernadero.interfaces';
 
 @Component({
@@ -13,17 +17,29 @@ import { InvernaderoResponse } from '../../../interfaces/invernadero.interfaces'
   styleUrl: './sidebar.scss',
 })
 export class Sidebar implements OnInit {
-  constructor(readonly router: Router) {}
-
-  private logoutService    = inject(LogoutService);
-  private auth             = inject(Auth);
+  private logoutService      = inject(LogoutService);
+  private auth               = inject(Auth);
   private invernaderoService = inject(InvernaderoService);
+  private dashboardService   = inject(DashboardService);
 
   readonly nombreUsuario     = this.auth.getNombreUsuario();
   readonly esAdmin           = this.auth.esAdministrador();
 
   readonly invernaderos        = signal<InvernaderoResponse[]>([]);
   readonly invernaderoActivoId = this.invernaderoService.invernaderoActivoId;
+
+  // Badge de Inventario = variedades con stock bajo del invernadero activo.
+  // Se recalcula al cambiar de invernadero; si es 0 el badge no se muestra.
+  readonly stockBajo = signal<number>(0);
+
+  constructor(readonly router: Router) {
+    toObservable(this.invernaderoService.invernaderoActivoId)
+      .pipe(
+        switchMap(id => this.dashboardService.getStats(id).pipe(catchError(() => of(null)))),
+        takeUntilDestroyed(),
+      )
+      .subscribe(stats => this.stockBajo.set(stats?.variedadesStockBajo ?? 0));
+  }
 
   reportesAbierto = false;
   adminAbierto    = false;

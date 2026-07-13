@@ -215,7 +215,7 @@
   position: fixed;
   top: 12px;
   left: 12px;
-  z-index: 1200;
+  z-index: 1040;                 // ← debajo del drawer (1100): al abrir queda cubierto
   background: #1a2e1c;
   color: #7ec47e;
   border: none;
@@ -240,11 +240,12 @@
   background: rgba(0, 0, 0, 0.45);
   z-index: 1050;
   opacity: 0;
+  pointer-events: none;          // ← invisible = deja pasar clics y scroll
   transition: opacity 0.25s ease;
 
   &--visible {
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto;        // ← solo captura clics cuando el drawer está abierto
   }
 }
 
@@ -252,7 +253,12 @@
 .close-mobile-btn { display: none; }
 
 // ── Responsivo ────────────────────────────────────────────────
-@media (max-width: 900px) {
+
+// Tablet (641–900px): riel de solo iconos.
+// Aquí NO hay chevrons visibles para colapsar, así que se muestran
+// todos los ítems. El rango evita que estos overrides se filtren al
+// modo drawer y rompan el colapso de submenús en móvil.
+@media (min-width: 641px) and (max-width: 900px) {
   .sidebar {
     width: 64px;
     padding: 16px 10px;
@@ -274,17 +280,21 @@
     }
 
     .nav-group-items {
-      max-height: none !important;
-      opacity: 1 !important;
+      max-height: none;
+      opacity: 1;
       overflow: visible;
     }
   }
 }
 
+// Móvil (≤640px): drawer deslizante.
+// El sidebar conserva su forma completa (labels + chevrons), por lo que
+// los submenús usan el comportamiento colapsable normal: se abren/cierran
+// con el chevron y siguen auto-abriéndose cuando su ruta está activa.
 @media (max-width: 640px) {
   .hamburger-btn    { display: flex; }
   .sidebar-backdrop { display: block; }
-  .close-mobile-btn { display: flex !important; }
+  .close-mobile-btn { display: flex; }
 
   .sidebar {
     position: fixed;
@@ -294,14 +304,6 @@
     height: 100vh;
     z-index: 1100;
     transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: none;
-
-    // restaurar estilos que el modo icono ocultó
-    .brand-name        { display: block; }
-    .nav-group-label   { display: flex; }
-    .nav-chevron       { display: inline-block; }
-    .sidebar-footer    { display: block; }
-    .nav-item span     { display: inline; }
 
     &--open {
       left: 0;

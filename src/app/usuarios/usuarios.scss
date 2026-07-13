@@ -106,7 +106,11 @@
   overflow: hidden;
 }
 
-.table-wrap { width: 100%; overflow-x: auto; }
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;   // scroll con inercia en iOS
+}
 
 .inv-table {
   width: 100%;
@@ -309,6 +313,7 @@
 
   .inv-table {
     font-size: 12px;
+    min-width: 600px;              // fuerza scroll horizontal en vez de aplastar columnas
 
     thead th,
     tbody td { padding: 10px 10px; }
