@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
+import { InvernaderoRequest, InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +17,14 @@ export class InvernaderoService {
     return this.http.get<InvernaderoResponse[]>(`${this.apiUrl}/listar`).pipe(
       map(data => data ?? [])
     );
+  }
+
+  guardar(request: InvernaderoRequest): Observable<InvernaderoResponse> {
+    return this.http.post<InvernaderoResponse>(`${this.apiUrl}/guardar`, request);
+  }
+
+  actualizar(id: number, request: InvernaderoRequest): Observable<InvernaderoResponse> {
+    return this.http.put<InvernaderoResponse>(`${this.apiUrl}/actualizar/${id}`, request);
   }
 
   setInvernaderoActivo(id: number | null): void {

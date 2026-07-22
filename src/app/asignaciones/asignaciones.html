@@ -6,6 +6,11 @@
     <!-- TOPBAR -->
     <div class="topbar">
       <span class="page-title">Asignación de invernaderos</span>
+      <div class="topbar-right">
+        <button class="btn-new" *ngIf="puedeCrearInvernadero" (click)="abrirModalInvernadero()">
+          <i class="ti ti-plus"></i> Nuevo invernadero
+        </button>
+      </div>
     </div>
 
     <!-- CONTENT -->
@@ -66,7 +71,7 @@
 
           <div class="form-field">
             <label>Agregar invernadero</label>
-            <select [(ngModel)]="invernaderoSeleccionado">
+            <select [(ngModel)]="invernaderoSeleccionado" (ngModelChange)="onSeleccionInvernadero()">
               <option [ngValue]="null" disabled>Selecciona un invernadero…</option>
               <option *ngFor="let inv of invernaderosDisponibles" [ngValue]="inv.id">
                 Invernadero #{{ inv.numero }} — {{ inv.nombreCultivo }}
@@ -81,6 +86,27 @@
                   [disabled]="guardando || invernaderoSeleccionado == null">
             <i class="ti ti-plus"></i> Asignar
           </button>
+        </div>
+
+        <!-- Ubicación del invernadero seleccionado (solo al seleccionar uno) -->
+        <div class="ubicacion-preview" *ngIf="invernaderoSeleccionado != null">
+          <ng-container *ngIf="seleccionadoTieneUbicacion; else sinUbic">
+            <div class="preview-head">
+              <span><i class="ti ti-map-pin"></i> Ubicación del invernadero seleccionado</span>
+              <a class="link-maps" *ngIf="mapaUrlSeleccionado" [href]="mapaUrlSeleccionado"
+                 target="_blank" rel="noopener noreferrer">
+                <i class="ti ti-external-link"></i> Google Maps
+              </a>
+            </div>
+            <div id="mapaAsignacion" class="mapa"></div>
+          </ng-container>
+
+          <ng-template #sinUbic>
+            <p class="empty">
+              <i class="ti ti-map-off"></i>
+              Este invernadero no tiene una ubicación registrada.
+            </p>
+          </ng-template>
         </div>
 
         <!-- Lista -->
@@ -103,4 +129,86 @@
 
     </div>
   </main>
+
+  <!-- MODAL: Nuevo invernadero -->
+  <div class="modal-overlay" *ngIf="mostrarModalInv" (click)="cerrarModalInvernadero()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title"><i class="ti ti-building-warehouse"></i> Nuevo invernadero</span>
+        <button class="modal-close" (click)="cerrarModalInvernadero()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Número <span class="req">*</span></label>
+            <input type="number" min="1" [(ngModel)]="formInv.numero" placeholder="Ej. 12" />
+          </div>
+
+          <div class="form-field">
+            <label>Nombre de cultivo <span class="req">*</span></label>
+            <input type="text" maxlength="100" [(ngModel)]="formInv.nombreCultivo"
+                   placeholder="Ej. Rosas" />
+          </div>
+
+          <div class="form-field" *ngIf="fincas.length > 1">
+            <label>Finca</label>
+            <select [(ngModel)]="formInv.fincaId">
+              <option [ngValue]="null">Sin finca</option>
+              <option *ngFor="let f of fincas" [ngValue]="f.id">{{ f.nombre }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Selector de ubicación -->
+        <div class="mapa-bloque">
+          <div class="mapa-head">
+            <label>Ubicación en el mapa <span class="opcional">(opcional)</span></label>
+            <div class="mapa-acciones">
+              <button type="button" class="btn-mini" (click)="usarMiUbicacion()">
+                <i class="ti ti-current-location"></i> Mi ubicación
+              </button>
+              <button type="button" class="btn-mini ghost" *ngIf="formInv.latitud != null"
+                      (click)="quitarUbicacion()">
+                <i class="ti ti-x"></i> Quitar
+              </button>
+            </div>
+          </div>
+
+          <p class="mapa-ayuda">Toca el mapa para colocar el pin (o arrástralo para ajustarlo).</p>
+
+          <div id="mapaInvernadero" class="mapa"></div>
+
+          <div class="coords">
+            <div class="form-field">
+              <label>Latitud</label>
+              <input type="number" step="0.000001" [(ngModel)]="formInv.latitud"
+                     (ngModelChange)="coordsManual()" placeholder="—" />
+            </div>
+            <div class="form-field">
+              <label>Longitud</label>
+              <input type="number" step="0.000001" [(ngModel)]="formInv.longitud"
+                     (ngModelChange)="coordsManual()" placeholder="—" />
+            </div>
+          </div>
+
+          <a class="link-maps" *ngIf="mapaUrlPreview" [href]="mapaUrlPreview" target="_blank"
+             rel="noopener noreferrer">
+            <i class="ti ti-map-pin"></i> Ver en Google Maps
+          </a>
+        </div>
+
+        <p class="form-error" *ngIf="errorFormInv">{{ errorFormInv }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModalInvernadero()" [disabled]="guardandoInv">Cancelar</button>
+        <button class="btn-new" (click)="guardarInvernadero()" [disabled]="guardandoInv">
+          <i class="ti ti-check"></i> {{ guardandoInv ? 'Guardando…' : 'Crear invernadero' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
