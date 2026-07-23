@@ -90,6 +90,83 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(30, 51, 32, 0.12);
+    border-color: #d7d1c4;
+  }
+  &:focus-visible {
+    outline: 2px solid #1e3320;
+    outline-offset: 2px;
+  }
+}
+
+// ── Detalle de un anuncio ─────────────────────────────────────
+.anuncio-detalle {
+  max-width: 640px;
+  margin: 0 auto;
+  animation: detalle-in 0.22s ease-out;
+}
+
+@keyframes detalle-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  margin-bottom: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1e3320;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  i { font-size: 17px; }
+  &:hover { opacity: 0.7; }
+}
+
+.detalle-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e8e3d8;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.detalle-img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  display: block;
+}
+
+.detalle-body { padding: 22px 24px 26px; }
+
+.detalle-titulo {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #1a2e1c;
+  margin: 8px 0 10px;
+  line-height: 1.25;
+}
+
+.detalle-texto {
+  font-size: 15px;
+  color: #2a2a26;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .anuncio-img {

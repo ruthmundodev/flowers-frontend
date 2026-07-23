@@ -25,7 +25,7 @@
 
         <div class="campana-item" *ngFor="let n of lista()"
              [class.no-leido]="!n.leido"
-             (click)="marcarLeido(n.id, $event)">
+             (click)="abrir(n)">
           <span class="campana-prio" [ngClass]="prioClase(n.prioridad)"></span>
           <div class="campana-item-body">
             <strong *ngIf="n.titulo">{{ n.titulo }}</strong>

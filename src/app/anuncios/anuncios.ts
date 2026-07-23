@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Sidebar } from '../shared/sidebar/sidebar';
@@ -25,6 +26,12 @@ export class Anuncios implements OnInit {
   anuncios: AnuncioResponse[] = [];
   cargando = true;
 
+  // Vista de detalle: cuando hay uno seleccionado, la lista se oculta y se
+  // muestra solo este anuncio con opción de volver. Se sincroniza con el
+  // query param ?id= para permitir deep-link desde la campana.
+  seleccionado: AnuncioResponse | null = null;
+  private idDeseado: number | null = null;
+
   // Permisos derivados del rol (Administrador siempre puede)
   puedeCrear = false;
   puedeEliminar = false;
@@ -40,6 +47,9 @@ export class Anuncios implements OnInit {
   readonly prioridades = ['INFO', 'NORMAL', 'IMPORTANTE', 'URGENTE'];
 
   private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private anuncioService: AnuncioService,
@@ -67,6 +77,17 @@ export class Anuncios implements OnInit {
       });
     }
 
+    // Deep-link: ?id= abre directamente ese anuncio (p. ej. desde la campana).
+    // Se escucha de forma reactiva para reaccionar aunque ya estemos en la ruta.
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const raw = params.get('id');
+        this.idDeseado = raw ? Number(raw) : null;
+        this.aplicarSeleccion();
+        this.cdr.markForCheck();
+      });
+
     this.cargar();
   }
 
@@ -76,6 +97,7 @@ export class Anuncios implements OnInit {
       next: (data) => {
         this.anuncios = data;
         this.cargando = false;
+        this.aplicarSeleccion();
         this.cdr.markForCheck();
       },
       error: () => {
@@ -83,6 +105,31 @@ export class Anuncios implements OnInit {
         this.notificacion.error('Error al cargar los anuncios');
         this.cdr.markForCheck();
       },
+    });
+  }
+
+  /** Sincroniza `seleccionado` con el id pedido por el query param. */
+  private aplicarSeleccion(): void {
+    this.seleccionado = this.idDeseado
+      ? this.anuncios.find((a) => a.id === this.idDeseado) ?? null
+      : null;
+  }
+
+  // ── Detalle ─────────────────────────────────────────────────
+  seleccionar(a: AnuncioResponse): void {
+    // Refleja la selección en la URL (para deep-link / recargar / atrás).
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { id: a.id },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  volver(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { id: null },
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -163,6 +210,8 @@ export class Anuncios implements OnInit {
         this.anuncioService.eliminar(a.id).subscribe({
           next: () => {
             this.anuncios = this.anuncios.filter(x => x.id !== a.id);
+            // Si estabas viéndolo en detalle, vuelve a la lista.
+            if (this.seleccionado?.id === a.id) this.volver();
             this.notificacion.exito('Anuncio eliminado correctamente');
             this.cdr.markForCheck();
           },

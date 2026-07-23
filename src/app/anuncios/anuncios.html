@@ -22,8 +22,10 @@
         No hay anuncios publicados.
       </p>
 
-      <div class="anuncios-grid" *ngIf="!cargando && anuncios.length > 0">
-        <article class="anuncio-card" *ngFor="let a of anuncios">
+      <!-- LISTA (se oculta cuando hay un anuncio seleccionado) -->
+      <div class="anuncios-grid" *ngIf="!cargando && anuncios.length > 0 && !seleccionado">
+        <article class="anuncio-card" *ngFor="let a of anuncios"
+                 (click)="seleccionar(a)" tabindex="0" role="button">
           <img class="anuncio-img" *ngIf="a.imagen" [src]="imgSrc(a.imagen)" alt="Imagen del anuncio" />
           <div class="anuncio-body">
             <div class="anuncio-head">
@@ -37,7 +39,36 @@
             <strong class="anuncio-titulo" *ngIf="a.titulo">{{ a.titulo }}</strong>
             <p class="anuncio-texto">{{ a.texto }}</p>
           </div>
-          <button class="btn-del" *ngIf="puedeEliminar" (click)="eliminar(a)" aria-label="Eliminar">
+          <button class="btn-del" *ngIf="puedeEliminar"
+                  (click)="eliminar(a); $event.stopPropagation()" aria-label="Eliminar">
+            <i class="ti ti-trash"></i>
+          </button>
+        </article>
+      </div>
+
+      <!-- DETALLE (un solo anuncio) -->
+      <div class="anuncio-detalle" *ngIf="!cargando && seleccionado">
+        <button class="btn-volver" (click)="volver()">
+          <i class="ti ti-arrow-left"></i> Volver a los anuncios
+        </button>
+
+        <article class="detalle-card">
+          <img class="detalle-img" *ngIf="seleccionado.imagen"
+               [src]="imgSrc(seleccionado.imagen)" alt="Imagen del anuncio" />
+          <div class="detalle-body">
+            <div class="anuncio-head">
+              <span class="prio-tag" [ngClass]="'prio-' + (seleccionado.prioridad || 'NORMAL').toLowerCase()">
+                {{ seleccionado.prioridad || 'NORMAL' }}
+              </span>
+              <span class="anuncio-dest" *ngIf="seleccionado.rolNombre">
+                <i class="ti ti-user"></i> {{ seleccionado.rolNombre }}
+              </span>
+            </div>
+            <h2 class="detalle-titulo" *ngIf="seleccionado.titulo">{{ seleccionado.titulo }}</h2>
+            <p class="detalle-texto">{{ seleccionado.texto }}</p>
+          </div>
+          <button class="btn-del" *ngIf="puedeEliminar"
+                  (click)="eliminar(seleccionado)" aria-label="Eliminar">
             <i class="ti ti-trash"></i>
           </button>
         </article>

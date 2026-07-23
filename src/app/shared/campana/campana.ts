@@ -1,9 +1,10 @@
 import { Component, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificacionAnuncioService } from '../../../services/services/notificacion-anuncio';
+import { NotificacionResponse } from '../../../interfaces/notificacion-anuncio.interfaces';
 import { Auth } from '../../../services/services/auth';
 
 /**
@@ -21,6 +22,7 @@ export class Campana {
   private notif = inject(NotificacionAnuncioService);
   private auth = inject(Auth);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   readonly noLeidas = this.notif.noLeidas;
   readonly lista = this.notif.lista;
@@ -50,9 +52,13 @@ export class Campana {
     this.abierto.set(false);
   }
 
-  marcarLeido(id: number, ev: Event): void {
-    ev.stopPropagation();
-    this.notif.marcarLeido(id).subscribe(() => this.cdr.markForCheck());
+  /** Abre el anuncio: lo marca como leído, cierra el panel y navega a él. */
+  abrir(n: NotificacionResponse): void {
+    if (!n.leido) {
+      this.notif.marcarLeido(n.id).subscribe(() => this.cdr.markForCheck());
+    }
+    this.cerrar();
+    this.router.navigate(['/anuncios'], { queryParams: { id: n.id } });
   }
 
   marcarTodas(): void {
