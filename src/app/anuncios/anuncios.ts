@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { AnuncioService } from '../../services/services/anuncio';
 import { NotificacionService } from '../../services/services/notificacion';
 import { Auth } from '../../services/services/auth';
@@ -36,6 +38,8 @@ export class Anuncios implements OnInit {
   // Para el modal: roles destinatarios y prioridades disponibles.
   roles: RolResponse[] = [];
   readonly prioridades = ['INFO', 'NORMAL', 'IMPORTANTE', 'URGENTE'];
+
+  private dialog = inject(MatDialog);
 
   constructor(
     private anuncioService: AnuncioService,
@@ -138,16 +142,33 @@ export class Anuncios implements OnInit {
   }
 
   eliminar(a: AnuncioResponse): void {
-    if (!confirm('¿Eliminar este anuncio?')) return;
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '380px',
+        autoFocus: false,
+        data: {
+          titulo: 'Eliminar anuncio',
+          mensaje: a.titulo
+            ? `¿Seguro que deseas eliminar el anuncio “${a.titulo}”? Esta acción no se puede deshacer.`
+            : '¿Seguro que deseas eliminar este anuncio? Esta acción no se puede deshacer.',
+          textoConfirmar: 'Eliminar',
+          textoCancelar: 'Cancelar',
+          peligro: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmado) => {
+        if (!confirmado) return;
 
-    this.anuncioService.eliminar(a.id).subscribe({
-      next: () => {
-        this.anuncios = this.anuncios.filter(x => x.id !== a.id);
-        this.notificacion.exito('Anuncio eliminado correctamente');
-        this.cdr.markForCheck();
-      },
-      error: () => this.notificacion.error('No se pudo eliminar el anuncio'),
-    });
+        this.anuncioService.eliminar(a.id).subscribe({
+          next: () => {
+            this.anuncios = this.anuncios.filter(x => x.id !== a.id);
+            this.notificacion.exito('Anuncio eliminado correctamente');
+            this.cdr.markForCheck();
+          },
+          error: () => this.notificacion.error('No se pudo eliminar el anuncio'),
+        });
+      });
   }
 
   imgSrc(imagen: string | null): string {

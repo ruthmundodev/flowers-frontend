@@ -50,7 +50,13 @@
   <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <span class="modal-title"><i class="ti ti-speakerphone"></i> Nuevo anuncio</span>
+        <span class="modal-title">
+          <span class="modal-title-icon"><i class="ti ti-speakerphone"></i></span>
+          <span>
+            Nuevo anuncio
+            <small class="modal-subtitle">Se mostrará en la campana de los destinatarios</small>
+          </span>
+        </span>
         <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
           <i class="ti ti-x"></i>
         </button>
@@ -58,46 +64,68 @@
 
       <div class="modal-body">
         <div class="form-field">
-          <label>Título (opcional)</label>
+          <label>Título <span class="opt">(opcional)</span></label>
           <input type="text" maxlength="120" [(ngModel)]="form.titulo"
                  placeholder="Título del anuncio" />
+          <span class="char-count">{{ (form.titulo || '').length }}/120</span>
         </div>
 
         <div class="form-field">
           <label>Texto <span class="req">*</span></label>
           <textarea rows="3" maxlength="200" [(ngModel)]="form.texto"
                     placeholder="Escribe el anuncio (máx. 200 caracteres)"></textarea>
+          <span class="char-count">{{ (form.texto || '').length }}/200</span>
         </div>
 
-        <div class="form-row">
-          <div class="form-field">
-            <label>Prioridad</label>
-            <select [(ngModel)]="form.prioridad">
-              <option *ngFor="let p of prioridades" [value]="p">{{ p }}</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Dirigido a</label>
-            <select [(ngModel)]="form.rolId">
-              <option [ngValue]="null">Todos</option>
-              <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nombre }}</option>
-            </select>
+        <div class="form-field">
+          <label>Prioridad</label>
+          <div class="prio-chips">
+            <button type="button" class="prio-chip"
+                    *ngFor="let p of prioridades"
+                    [ngClass]="'prio-' + p.toLowerCase()"
+                    [class.activa]="form.prioridad === p"
+                    (click)="form.prioridad = p">
+              {{ p }}
+            </button>
           </div>
         </div>
 
         <div class="form-field">
-          <label>Imagen (opcional)</label>
-          <input type="file" accept="image/*" (change)="onImagenSeleccionada($event)" />
-          <img class="preview" *ngIf="form.imagen" [src]="imgSrc(form.imagen)" alt="Vista previa" />
+          <label>Dirigido a</label>
+          <select [(ngModel)]="form.rolId">
+            <option [ngValue]="null">Todos</option>
+            <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nombre }}</option>
+          </select>
         </div>
 
-        <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+        <div class="form-field">
+          <label>Imagen <span class="opt">(opcional)</span></label>
+
+          <label class="dropzone" *ngIf="!form.imagen">
+            <i class="ti ti-photo-plus"></i>
+            <span>Haz clic para subir una imagen</span>
+            <small>PNG o JPG</small>
+            <input type="file" accept="image/*" (change)="onImagenSeleccionada($event)" hidden />
+          </label>
+
+          <div class="preview-wrap" *ngIf="form.imagen">
+            <img class="preview" [src]="imgSrc(form.imagen)" alt="Vista previa" />
+            <button type="button" class="preview-del" (click)="form.imagen = null"
+                    aria-label="Quitar imagen">
+              <i class="ti ti-x"></i>
+            </button>
+          </div>
+        </div>
+
+        <p class="form-error" *ngIf="errorForm"><i class="ti ti-alert-circle"></i> {{ errorForm }}</p>
       </div>
 
       <div class="modal-footer">
         <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
         <button class="btn-new" (click)="guardarAnuncio()" [disabled]="guardando">
-          <i class="ti ti-check"></i> {{ guardando ? 'Publicando…' : 'Publicar' }}
+          <i class="ti" [class.ti-check]="!guardando" [class.ti-loader-2]="guardando"
+             [class.spin]="guardando"></i>
+          {{ guardando ? 'Publicando…' : 'Publicar' }}
         </button>
       </div>
     </div>
