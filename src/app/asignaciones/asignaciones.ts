@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import * as L from 'leaflet';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { UsuarioService } from '../../services/services/usuario';
 import { InvernaderoService } from '../../services/services/invernadero';
 import { InvernaderoUsuarioService } from '../../services/services/invernadero-usuario';
@@ -57,6 +59,8 @@ export class Asignaciones implements OnInit, OnDestroy {
   // Mapa de solo lectura para previsualizar la ubicación del invernadero
   // seleccionado en la asignación.
   private mapaPreview: L.Map | null = null;
+
+  private dialog = inject(MatDialog);
 
   constructor(
     private usuarioService: UsuarioService,
@@ -240,16 +244,31 @@ export class Asignaciones implements OnInit, OnDestroy {
   }
 
   quitar(a: InvernaderoUsuarioResponse): void {
-    if (!confirm(`¿Quitar el invernadero #${a.invernaderoNumero} de este ${this.rolFiltro.toLowerCase()}?`)) return;
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '380px',
+        autoFocus: false,
+        data: {
+          titulo: 'Quitar asignación',
+          mensaje: `¿Seguro que deseas quitar el invernadero #${a.invernaderoNumero} de este ${this.rolFiltro.toLowerCase()}?`,
+          textoConfirmar: 'Quitar',
+          textoCancelar: 'Cancelar',
+          peligro: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmado) => {
+        if (!confirmado) return;
 
-    this.invUsuarioService.eliminar(a.id).subscribe({
-      next: () => {
-        this.asignaciones = this.asignaciones.filter(x => x.id !== a.id);
-        this.notificacion.exito('Asignación eliminada correctamente');
-        this.cdr.markForCheck();
-      },
-      error: () => this.notificacion.error('No se pudo eliminar la asignación'),
-    });
+        this.invUsuarioService.eliminar(a.id).subscribe({
+          next: () => {
+            this.asignaciones = this.asignaciones.filter(x => x.id !== a.id);
+            this.notificacion.exito('Asignación eliminada correctamente');
+            this.cdr.markForCheck();
+          },
+          error: () => this.notificacion.error('No se pudo eliminar la asignación'),
+        });
+      });
   }
 
   // ── Modal "Nuevo invernadero" ─────────────────────────────────

@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { RendimientoService } from '../../services/services/rendimiento';
 import { RendimientoRequest, RendimientoResponse } from '../../interfaces/rendimiento.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
@@ -29,6 +31,8 @@ export class Rendimientos implements OnInit {
   errorForm = '';
 
   form: RendimientoRequest = this.formVacio();
+
+  private dialog = inject(MatDialog);
 
   constructor(
     private rendimientoService: RendimientoService,
@@ -124,17 +128,32 @@ export class Rendimientos implements OnInit {
 
   // ── Eliminar ────────────────────────────────────────────────
   eliminar(r: RendimientoResponse): void {
-    if (!confirm(`¿Eliminar el rendimiento de "${r.nombreVariedad ?? 'esta variedad'}"?`)) return;
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '380px',
+        autoFocus: false,
+        data: {
+          titulo: 'Eliminar rendimiento',
+          mensaje: `¿Seguro que deseas eliminar el rendimiento de “${r.nombreVariedad ?? 'esta variedad'}”? Esta acción no se puede deshacer.`,
+          textoConfirmar: 'Eliminar',
+          textoCancelar: 'Cancelar',
+          peligro: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmado) => {
+        if (!confirmado) return;
 
-    this.rendimientoService.eliminar(r.id).subscribe({
-      next: () => {
-        this.rendimientos = this.rendimientos.filter(x => x.id !== r.id);
-        if (this.editandoId === r.id) this.limpiar();
-        this.notificacion.exito('Rendimiento eliminado correctamente');
-        this.cdr.markForCheck();
-      },
-      error: () => this.notificacion.error('No se pudo eliminar el rendimiento'),
-    });
+        this.rendimientoService.eliminar(r.id).subscribe({
+          next: () => {
+            this.rendimientos = this.rendimientos.filter(x => x.id !== r.id);
+            if (this.editandoId === r.id) this.limpiar();
+            this.notificacion.exito('Rendimiento eliminado correctamente');
+            this.cdr.markForCheck();
+          },
+          error: () => this.notificacion.error('No se pudo eliminar el rendimiento'),
+        });
+      });
   }
 
   private formVacio(): RendimientoRequest {

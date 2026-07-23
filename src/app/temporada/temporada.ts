@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { TemporadaService } from '../../services/services/temporada';
 import { TemporadaRequest, TemporadaResponse } from '../../interfaces/temporada.interfaces';
 import { NotificacionService } from '../../services/services/notificacion';
@@ -33,6 +35,8 @@ export class Temporada implements OnInit {
   errorForm = '';
 
   form: TemporadaRequest = this.formVacio();
+
+  private dialog = inject(MatDialog);
 
   constructor(
     private temporadaService: TemporadaService,
@@ -130,17 +134,32 @@ export class Temporada implements OnInit {
   // ── Eliminar ────────────────────────────────────────────────
   eliminar(t: TemporadaResponse, event: MouseEvent): void {
     event.stopPropagation();
-    if (!confirm(`¿Eliminar la temporada ${this.nombreMes(t.mes)} ${t.year}?`)) return;
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '380px',
+        autoFocus: false,
+        data: {
+          titulo: 'Eliminar temporada',
+          mensaje: `¿Seguro que deseas eliminar la temporada ${this.nombreMes(t.mes)} ${t.year}? Esta acción no se puede deshacer.`,
+          textoConfirmar: 'Eliminar',
+          textoCancelar: 'Cancelar',
+          peligro: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmado) => {
+        if (!confirmado) return;
 
-    this.temporadaService.eliminar(t.id).subscribe({
-      next: () => {
-        this.temporadas = this.temporadas.filter(r => r.id !== t.id);
-        if (this.editandoId === t.id) this.cancelar();
-        this.notificacion.exito('Temporada eliminada correctamente');
-        this.cdr.markForCheck();
-      },
-      error: () => this.notificacion.error('No se pudo eliminar la temporada'),
-    });
+        this.temporadaService.eliminar(t.id).subscribe({
+          next: () => {
+            this.temporadas = this.temporadas.filter(r => r.id !== t.id);
+            if (this.editandoId === t.id) this.cancelar();
+            this.notificacion.exito('Temporada eliminada correctamente');
+            this.cdr.markForCheck();
+          },
+          error: () => this.notificacion.error('No se pudo eliminar la temporada'),
+        });
+      });
   }
 
   // ── Helpers ─────────────────────────────────────────────────

@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { QuimicoService } from '../../services/services/quimico';
 import { QuimicoRequest, QuimicoResponse } from '../../interfaces/quimico.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
@@ -32,6 +34,8 @@ export class Quimico implements OnInit {
   errorModal = '';
 
   form: QuimicoRequest = this.formVacio();
+
+  private dialog = inject(MatDialog);
 
   constructor(
     private quimicoService: QuimicoService,
@@ -156,16 +160,31 @@ export class Quimico implements OnInit {
 
   // ── Eliminar ────────────────────────────────────────────────
   eliminar(q: QuimicoResponse): void {
-    if (!confirm(`¿Eliminar "${q.nombre}"?`)) return;
+    this.dialog
+      .open(ConfirmDialog, {
+        width: '380px',
+        autoFocus: false,
+        data: {
+          titulo: 'Eliminar químico',
+          mensaje: `¿Seguro que deseas eliminar “${q.nombre}”? Esta acción no se puede deshacer.`,
+          textoConfirmar: 'Eliminar',
+          textoCancelar: 'Cancelar',
+          peligro: true,
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmado) => {
+        if (!confirmado) return;
 
-    this.quimicoService.eliminar(q.id).subscribe({
-      next: () => {
-        this.quimicos = this.quimicos.filter(r => r.id !== q.id);
-        this.notificacion.exito('Químico eliminado correctamente');
-        this.cdr.markForCheck();
-      },
-      error: () => this.notificacion.error('No se pudo eliminar el registro'),
-    });
+        this.quimicoService.eliminar(q.id).subscribe({
+          next: () => {
+            this.quimicos = this.quimicos.filter(r => r.id !== q.id);
+            this.notificacion.exito('Químico eliminado correctamente');
+            this.cdr.markForCheck();
+          },
+          error: () => this.notificacion.error('No se pudo eliminar el registro'),
+        });
+      });
   }
 
   // ── Helpers ─────────────────────────────────────────────────
