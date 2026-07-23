@@ -9,10 +9,11 @@ import { Auth } from '../../../services/services/auth';
 import { InvernaderoService } from '../../../services/services/invernadero';
 import { DashboardService } from '../../../services/services/dashboard';
 import { InvernaderoResponse } from '../../../interfaces/invernadero.interfaces';
+import { Campana } from '../campana/campana';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, Campana],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })

@@ -1,0 +1,43 @@
+<div class="campana-wrap">
+  <button class="campana-btn" (click)="toggle()" title="Notificaciones"
+          aria-label="Notificaciones">
+    <i class="ti ti-bell"></i>
+    <span class="campana-badge" *ngIf="noLeidas() > 0">
+      {{ noLeidas() > 9 ? '9+' : noLeidas() }}
+    </span>
+  </button>
+
+  <ng-container *ngIf="abierto()">
+    <div class="campana-backdrop" (click)="cerrar()"></div>
+
+    <div class="campana-panel">
+      <div class="campana-panel-head">
+        <span>Notificaciones</span>
+        <button class="campana-link" *ngIf="noLeidas() > 0" (click)="marcarTodas()">
+          Marcar todas
+        </button>
+      </div>
+
+      <div class="campana-list">
+        <p class="campana-empty" *ngIf="lista().length === 0">
+          No tienes anuncios.
+        </p>
+
+        <div class="campana-item" *ngFor="let n of lista()"
+             [class.no-leido]="!n.leido"
+             (click)="marcarLeido(n.id, $event)">
+          <span class="campana-prio" [ngClass]="prioClase(n.prioridad)"></span>
+          <div class="campana-item-body">
+            <strong *ngIf="n.titulo">{{ n.titulo }}</strong>
+            <p>{{ n.texto }}</p>
+          </div>
+          <span class="campana-dot" *ngIf="!n.leido" title="No leída"></span>
+        </div>
+      </div>
+
+      <a class="campana-verall" routerLink="/anuncios" (click)="cerrar()">
+        Ver todos los anuncios
+      </a>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,171 @@
+.campana-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.campana-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.campana-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #e23b3b;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* Backdrop transparente para cerrar al hacer clic fuera */
+.campana-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+/* Panel fijo para evitar recortes por overflow del sidebar */
+.campana-panel {
+  position: fixed;
+  top: 60px;
+  left: 16px;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  max-height: 70vh;
+  background: #fff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.campana-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.campana-link {
+  background: none;
+  border: none;
+  color: #2e7d46;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover { text-decoration: underline; }
+}
+
+.campana-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.campana-empty {
+  padding: 24px 14px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.campana-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid #f6f6f6;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover { background: #f9fafb; }
+
+  &.no-leido { background: #f1f8f3; }
+}
+
+.campana-prio {
+  width: 6px;
+  align-self: stretch;
+  border-radius: 3px;
+  flex: 0 0 6px;
+  background: #9ca3af;
+
+  &.prio-info { background: #3b82f6; }
+  &.prio-normal { background: #9ca3af; }
+  &.prio-importante { background: #f59e0b; }
+  &.prio-urgente { background: #e23b3b; }
+}
+
+.campana-item-body {
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #4b5563;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+.campana-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2e7d46;
+  flex: 0 0 8px;
+  margin-top: 5px;
+}
+
+.campana-verall {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2e7d46;
+  text-decoration: none;
+  border-top: 1px solid #f0f0f0;
+
+  &:hover { background: #f9fafb; }
+}

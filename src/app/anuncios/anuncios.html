@@ -26,6 +26,15 @@
         <article class="anuncio-card" *ngFor="let a of anuncios">
           <img class="anuncio-img" *ngIf="a.imagen" [src]="imgSrc(a.imagen)" alt="Imagen del anuncio" />
           <div class="anuncio-body">
+            <div class="anuncio-head">
+              <span class="prio-tag" [ngClass]="'prio-' + (a.prioridad || 'NORMAL').toLowerCase()">
+                {{ a.prioridad || 'NORMAL' }}
+              </span>
+              <span class="anuncio-dest" *ngIf="a.rolNombre">
+                <i class="ti ti-user"></i> {{ a.rolNombre }}
+              </span>
+            </div>
+            <strong class="anuncio-titulo" *ngIf="a.titulo">{{ a.titulo }}</strong>
             <p class="anuncio-texto">{{ a.texto }}</p>
           </div>
           <button class="btn-del" *ngIf="puedeEliminar" (click)="eliminar(a)" aria-label="Eliminar">
@@ -49,9 +58,31 @@
 
       <div class="modal-body">
         <div class="form-field">
+          <label>Título (opcional)</label>
+          <input type="text" maxlength="120" [(ngModel)]="form.titulo"
+                 placeholder="Título del anuncio" />
+        </div>
+
+        <div class="form-field">
           <label>Texto <span class="req">*</span></label>
           <textarea rows="3" maxlength="200" [(ngModel)]="form.texto"
                     placeholder="Escribe el anuncio (máx. 200 caracteres)"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label>Prioridad</label>
+            <select [(ngModel)]="form.prioridad">
+              <option *ngFor="let p of prioridades" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Dirigido a</label>
+            <select [(ngModel)]="form.rolId">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nombre }}</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-field">

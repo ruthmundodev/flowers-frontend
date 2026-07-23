@@ -232,3 +232,48 @@
   padding: 14px 20px;
   border-top: 1px solid #ece8df;
 }
+
+/* ── Extras: prioridad, título y destinatario ───────────────── */
+.form-row {
+  display: flex;
+  gap: 12px;
+
+  .form-field { flex: 1; }
+}
+
+.anuncio-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.prio-tag {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #fff;
+  background: #9ca3af;
+
+  &.prio-info { background: #3b82f6; }
+  &.prio-normal { background: #9ca3af; }
+  &.prio-importante { background: #f59e0b; }
+  &.prio-urgente { background: #e23b3b; }
+}
+
+.anuncio-dest {
+  font-size: 0.72rem;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.anuncio-titulo {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: #1f2937;
+}

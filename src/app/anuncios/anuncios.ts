@@ -7,6 +7,8 @@ import { AnuncioService } from '../../services/services/anuncio';
 import { NotificacionService } from '../../services/services/notificacion';
 import { Auth } from '../../services/services/auth';
 import { AnuncioRequest, AnuncioResponse } from '../../interfaces/anuncio.interfaces';
+import { RolService } from '../../services/services/rol';
+import { RolResponse } from '../../interfaces/rol.interfaces';
 
 @Component({
   selector: 'app-anuncios',
@@ -29,20 +31,37 @@ export class Anuncios implements OnInit {
   mostrarModal = false;
   guardando = false;
   errorForm = '';
-  form: AnuncioRequest = { texto: '', imagen: null };
+  form: AnuncioRequest = this.formVacio();
+
+  // Para el modal: roles destinatarios y prioridades disponibles.
+  roles: RolResponse[] = [];
+  readonly prioridades = ['INFO', 'NORMAL', 'IMPORTANTE', 'URGENTE'];
 
   constructor(
     private anuncioService: AnuncioService,
+    private rolService: RolService,
     private notificacion: NotificacionService,
     private auth: Auth,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  private formVacio(): AnuncioRequest {
+    return { titulo: '', texto: '', prioridad: 'NORMAL', rolId: null, imagen: null };
+  }
 
   ngOnInit(): void {
     const admin = this.auth.esAdministrador();
     const permiso = this.auth.getPermiso(this.MODULO);
     this.puedeCrear = admin || !!permiso?.crear;
     this.puedeEliminar = admin || !!permiso?.eliminar;
+
+    // Roles para el selector "Dirigido a" (solo si puede crear).
+    if (this.puedeCrear) {
+      this.rolService.listar().subscribe({
+        next: (r) => { this.roles = r; this.cdr.markForCheck(); },
+        error: () => { /* sin roles el selector queda solo con "Todos" */ },
+      });
+    }
 
     this.cargar();
   }
@@ -65,7 +84,7 @@ export class Anuncios implements OnInit {
 
   // ── Modal ───────────────────────────────────────────────────
   abrirModal(): void {
-    this.form = { texto: '', imagen: null };
+    this.form = this.formVacio();
     this.errorForm = '';
     this.mostrarModal = true;
   }
