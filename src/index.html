@@ -21,6 +21,15 @@
       rel="stylesheet"
     />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script>
+      // Aplica el tema guardado antes de renderizar para evitar el flash claro.
+      (function () {
+        try {
+          var t = localStorage.getItem('tema');
+          document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

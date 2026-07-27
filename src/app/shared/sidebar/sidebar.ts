@@ -9,6 +9,7 @@ import { Auth } from '../../../services/services/auth';
 import { InvernaderoService } from '../../../services/services/invernadero';
 import { DashboardService } from '../../../services/services/dashboard';
 import { InvernaderoResponse } from '../../../interfaces/invernadero.interfaces';
+import { ThemeService } from '../../../services/services/theme';
 import { Campana } from '../campana/campana';
 
 @Component({
@@ -22,6 +23,7 @@ export class Sidebar implements OnInit {
   private auth               = inject(Auth);
   private invernaderoService = inject(InvernaderoService);
   private dashboardService   = inject(DashboardService);
+  readonly tema              = inject(ThemeService);
 
   readonly nombreUsuario     = this.auth.getNombreUsuario();
   readonly esAdmin           = this.auth.esAdministrador();

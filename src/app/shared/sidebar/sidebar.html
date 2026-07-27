@@ -16,6 +16,11 @@
       <i class="ti ti-x"></i>
     </button>
     <app-campana />
+    <button class="logout-btn" (click)="tema.alternar()"
+            [title]="tema.esOscuro() ? 'Modo claro' : 'Modo oscuro'"
+            aria-label="Cambiar tema">
+      <i class="ti" [class.ti-moon]="!tema.esOscuro()" [class.ti-sun]="tema.esOscuro()"></i>
+    </button>
     <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
       <i class="ti ti-logout"></i>
     </button>

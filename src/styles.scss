@@ -36,6 +36,10 @@ body {
   margin: 0;
   height: 100%;
 }
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -96,5 +100,321 @@ app-root {
     border: 3px solid #fff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
     transform: rotate(-45deg);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TEMA OSCURO — estilo suave tipo Apple (charcoal cálido, no negro puro).
+
+   Los componentes tienen sus colores hardcodeados para el tema claro. En vez
+   de tocar cada .scss, esta capa global re-mapea las clases estructurales que
+   todos los componentes comparten (.app-shell, .topbar, .card, .inv-table,
+   .modal-*, .field-input, .btn-*, etc.) cuando <html data-theme="dark">.
+
+   Se usa `!important` a propósito: las reglas de componente van "scopeadas"
+   con un atributo (_ngcontent) que les da más especificidad; esta es la forma
+   robusta de que una capa de tema gane sin auditar cada selector. Los acentos
+   de color (badges, prioridades, gráficas) se dejan intactos.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* Transición suave al alternar tema. Solo se activa mientras <html> lleva la
+   clase `theme-anim` (la pone/quita ThemeService durante ~360ms), así el
+   cambio claro↔oscuro se funde en conjunto sin afectar hovers ni animaciones
+   normales. Aplica en ambos sentidos por estar fuera del bloque data-theme. */
+html.theme-anim,
+html.theme-anim * {
+  transition: background-color 0.35s ease, border-color 0.35s ease,
+    color 0.35s ease, fill 0.35s ease !important;
+}
+
+html[data-theme='dark'] {
+  --d-bg: #191813;
+  --d-surface: #22201b;
+  --d-surface-2: #2b2823;
+  --d-surface-3: #34302a;
+  --d-border: #38352d;
+  --d-border-2: #454036;
+  --d-text: #efece3;
+  --d-text-2: #bdb9ad;
+  --d-text-3: #918d81;
+  --d-primary: #356a3d;
+  --d-primary-hover: #3f7d49;
+  --d-primary-ink: #d8efd8;
+  --d-danger: #e5695f;
+
+  // ── Fondo de página ─────────────────────────────────────────
+  .app-shell,
+  app-login {
+    background: var(--d-bg) !important;
+  }
+  body { background: var(--d-bg); }
+  .login-wrap { border-color: var(--d-border) !important; }
+
+  // ── Topbar ──────────────────────────────────────────────────
+  .topbar {
+    background: var(--d-surface) !important;
+    border-color: var(--d-border) !important;
+  }
+  .page-title { color: var(--d-text) !important; }
+
+  // ── Superficies (cards, tablas, modales, paneles) ───────────
+  .card,
+  .table-wrap,
+  .kpi-card,
+  .stat-card,
+  .form-card,
+  .cultivos-card,
+  .right-col > *,
+  .modal-card,
+  .modal,
+  .campana-panel,
+  .mapa-bloque,
+  .ubicacion-preview,
+  .login-right {
+    background: var(--d-surface) !important;
+    border-color: var(--d-border) !important;
+    color: var(--d-text);
+  }
+
+  // ── Búsqueda / selects contenedores ─────────────────────────
+  .search-box {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border-2) !important;
+  }
+  .search-box input {
+    background: transparent !important;
+    color: var(--d-text) !important;
+  }
+  .search-box i,
+  .search-box input::placeholder { color: var(--d-text-3) !important; }
+
+  // ── Inputs de formularios ───────────────────────────────────
+  .field-input,
+  .farm-select,
+  .form-field input,
+  .form-field select,
+  .form-field textarea,
+  .modal-body input,
+  .modal-body select,
+  .modal-body textarea {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border-2) !important;
+    color: var(--d-text) !important;
+  }
+  input::placeholder,
+  textarea::placeholder { color: var(--d-text-3) !important; }
+
+  // ── Texto ───────────────────────────────────────────────────
+  .sec-title,
+  .card-title,
+  .card-head,
+  .modal-title,
+  .form-title,
+  .field-label,
+  .seed-title,
+  .cultivo-title,
+  .detalle-titulo,
+  .q-nombre,
+  .stat-card-num,
+  .kpi-val,
+  .lr-title,
+  .brand-name {
+    color: var(--d-text) !important;
+  }
+
+  .estado,
+  .state-msg,
+  .empty,
+  .empty-row,
+  .text-muted,
+  .kpi-label,
+  .kpi-sub,
+  .seed-sub,
+  .stat-card-label,
+  .stat-card-sub,
+  .cultivo-sub,
+  .modal-subtitle,
+  .activity-sub,
+  .activity-time,
+  .chart-sub,
+  .char-count,
+  .coords,
+  .lr-sub,
+  .campana-empty,
+  .nav-group-label {
+    color: var(--d-text-3) !important;
+  }
+
+  .detalle-texto,
+  .anuncio-texto,
+  .desc-cell,
+  .stock-val,
+  td { color: var(--d-text-2); }
+
+  // Celdas de texto principal (nombre en tablas). El componente les pone un
+  // color casi negro con más especificidad; forzamos texto claro legible.
+  .inv-table td.strong,
+  .inv-table .strong,
+  td.strong { color: var(--d-text) !important; }
+
+  // ── Tablas ──────────────────────────────────────────────────
+  .inv-table th,
+  .inv-table thead th,
+  .cultivos-table th {
+    color: var(--d-text-3) !important;
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border) !important;
+  }
+  .inv-table td,
+  .cultivos-table td {
+    border-color: var(--d-border) !important;
+  }
+  // El hover cubre tablas con o sin <tbody> explícito (usuarios/inventario).
+  .inv-table tbody tr:hover,
+  .inv-table tbody tr:hover td,
+  .inv-table tr:hover td,
+  .cultivos-table tbody tr:hover,
+  .cultivos-table tbody tr:hover td,
+  .cultivos-table tr:hover td {
+    background: var(--d-surface-3) !important;
+  }
+  // Fila seleccionada (temporada): tinte verde sutil en vez del verde claro.
+  .inv-table tr.row-active td {
+    background: rgba(53, 106, 61, 0.18) !important;
+  }
+
+  // ── Botones ─────────────────────────────────────────────────
+  .btn-new,
+  .btn-primary {
+    background: var(--d-primary) !important;
+    color: var(--d-primary-ink) !important;
+    &:hover { background: var(--d-primary-hover) !important; }
+  }
+  .btn-light,
+  .btn-mini {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border-2) !important;
+    color: var(--d-text-2) !important;
+    &:hover { background: var(--d-surface-3) !important; }
+  }
+  // Botones de acción con fondo/borde propios (íconos de editar, resetear, etc.).
+  .btn-icon,
+  .btn-action,
+  .btn-del {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border-2) !important;
+    color: var(--d-text-2) !important;
+    &:hover {
+      background: var(--d-surface-3) !important;
+      border-color: var(--d-border-2) !important;
+      color: var(--d-text) !important;
+    }
+  }
+  // El de cerrar modal es transparente (sin borde), solo cambia al hover.
+  .modal-close {
+    color: var(--d-text-2) !important;
+    &:hover { background: var(--d-surface-2) !important; color: var(--d-text) !important; }
+  }
+
+  // ── Badges neutros (los de color se dejan como acento) ──────
+  .badge--gray {
+    background: var(--d-surface-3) !important;
+    color: var(--d-text-2) !important;
+  }
+
+  // ── Badges de rol (pantalla de usuarios) ────────────────────
+  // En claro son pastel; en oscuro se lavan. Aquí van tintados
+  // translúcidos con texto brillante y borde del mismo tono para
+  // buen contraste y que cada rol se distinga bien. Acotado a
+  // app-usuarios para no tocar los badges de stock de inventario.
+  app-usuarios {
+    .badge {
+      border: 1px solid transparent;
+      font-weight: 600 !important;
+    }
+    .badge--green {          // Administrador
+      background: rgba(88, 176, 100, 0.20) !important;
+      color: #93de99 !important;
+      border-color: rgba(88, 176, 100, 0.45) !important;
+    }
+    .badge--blue {           // Supervisor
+      background: rgba(96, 156, 224, 0.22) !important;
+      color: #8fc0f2 !important;
+      border-color: rgba(96, 156, 224, 0.45) !important;
+    }
+    .badge--gray {           // Sembrador
+      background: rgba(190, 184, 170, 0.16) !important;
+      color: #d2cec2 !important;
+      border-color: rgba(190, 184, 170, 0.35) !important;
+    }
+  }
+
+  // ── Asignaciones: tabs de rol y lista ───────────────────────
+  // El verde #1e3320 (casi negro) se pierde sobre el fondo oscuro; usamos el
+  // primario del tema (más luminoso) y superficies oscuras coherentes.
+  .rol-tab {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border-2) !important;
+    color: var(--d-text-2) !important;
+    &:hover { background: var(--d-surface-3) !important; color: var(--d-text) !important; }
+  }
+  .rol-tab.active {
+    background: var(--d-primary) !important;
+    border-color: var(--d-primary) !important;
+    color: var(--d-primary-ink) !important;
+  }
+  .asig-list li {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border) !important;
+    color: var(--d-text-2) !important;
+  }
+  .asig-list li span i { color: var(--d-primary-ink) !important; }
+  // Ícono del encabezado (ti-user-cog) también en verde claro legible.
+  .card-head i { color: var(--d-primary-ink) !important; }
+
+  // ── Separadores genéricos ───────────────────────────────────
+  .modal-header,
+  .modal-footer,
+  .form-header,
+  .form-footer,
+  .card-header,
+  .sec-header,
+  .campana-panel-head,
+  .campana-item,
+  .campana-verall {
+    border-color: var(--d-border) !important;
+  }
+  // Cabecera/pie de formulario con fondo claro propio (temporada, etc.).
+  .form-header,
+  .form-footer {
+    background: var(--d-surface-2) !important;
+  }
+
+  // ── Campana (panel de notificaciones) ───────────────────────
+  .campana-item:hover,
+  .campana-verall { background: var(--d-surface-2) !important; }
+  .campana-item.no-leido { background: rgba(126, 196, 126, 0.08) !important; }
+  .campana-item-body strong { color: var(--d-text) !important; }
+  .campana-item-body p { color: var(--d-text-2) !important; }
+
+  // ── Diálogos Material (ConfirmDialog en overlay) ────────────
+  .mat-mdc-dialog-surface,
+  .mat-mdc-dialog-container {
+    background: var(--d-surface) !important;
+    color: var(--d-text) !important;
+  }
+  .confirm-titulo { color: var(--d-text) !important; }
+  .confirm-mensaje { color: var(--d-text-2) !important; }
+  .confirm-icon:not(.peligro) {
+    background: var(--d-surface-3) !important;
+    color: var(--d-primary-ink) !important;
+  }
+  .c-btn-light {
+    background: var(--d-surface-2) !important;
+    border-color: var(--d-border-2) !important;
+    color: var(--d-text-2) !important;
+  }
+  .c-btn-primario {
+    background: var(--d-primary) !important;
+    color: var(--d-primary-ink) !important;
   }
 }
