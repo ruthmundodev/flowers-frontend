@@ -6,6 +6,7 @@ export interface VariedadResponse {
   fechaInicio: string | null;
   fechaPoda: string | null;
   parental: string | null;
+  tipo: string | null;
   createdAt: string | null;
   invernaderoId: number | null;
   invernaderoNombre: string | null;
@@ -19,4 +20,5 @@ export interface VariedadRequest {
   fechaPoda: string | null;
   invernaderoId: number | null;
   parental: string;
+  tipo: string;
 }

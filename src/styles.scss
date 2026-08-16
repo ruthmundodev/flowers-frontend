@@ -207,6 +207,7 @@ html[data-theme='dark'] {
   .sec-title,
   .card-title,
   .card-head,
+  .preview-head span,
   .modal-title,
   .form-title,
   .field-label,
@@ -369,7 +370,8 @@ html[data-theme='dark'] {
   }
   .asig-list li span i { color: var(--d-primary-ink) !important; }
   // Ícono del encabezado (ti-user-cog) también en verde claro legible.
-  .card-head i { color: var(--d-primary-ink) !important; }
+  .card-head i,
+  .preview-head span i { color: var(--d-primary-ink) !important; }
 
   // ── Separadores genéricos ───────────────────────────────────
   .modal-header,

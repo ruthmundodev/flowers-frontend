@@ -11,9 +11,8 @@ import { InvernaderoService } from '../../services/services/invernadero';
 import { InvernaderoUsuarioService } from '../../services/services/invernadero-usuario';
 import { FincaService } from '../../services/services/finca';
 import { NotificacionService } from '../../services/services/notificacion';
-import { Auth } from '../../services/services/auth';
 import { UsuarioResponse } from '../../interfaces/usuario.interfaces';
-import { InvernaderoRequest, InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
+import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
 import { FincaResponse } from '../../interfaces/finca.interfaces';
 import { InvernaderoUsuarioResponse } from '../../interfaces/invernadero-usuario.interfaces';
 
@@ -44,18 +43,6 @@ export class Asignaciones implements OnInit, OnDestroy {
   cargando = true;
   guardando = false;
 
-  // ── Alta de invernadero (modal con mapa) ────────────────────
-  puedeCrearInvernadero = false;
-  mostrarModalInv = false;
-  guardandoInv = false;
-  errorFormInv = '';
-  formInv: InvernaderoRequest = this.formVacio();
-
-  private mapa: L.Map | null = null;
-  private marcador: L.Marker | null = null;
-  // Centro por defecto: Guatemala (cuando aún no hay coordenadas elegidas).
-  private readonly centroPorDefecto: L.LatLngTuple = [14.6349, -90.5069];
-
   // Mapa de solo lectura para previsualizar la ubicación del invernadero
   // seleccionado en la asignación.
   private mapaPreview: L.Map | null = null;
@@ -68,14 +55,10 @@ export class Asignaciones implements OnInit, OnDestroy {
     private invUsuarioService: InvernaderoUsuarioService,
     private fincaService: FincaService,
     private notificacion: NotificacionService,
-    private auth: Auth,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.puedeCrearInvernadero =
-      this.auth.esAdministrador() || !!this.auth.getPermiso('Asignaciones')?.crear;
-
     this.usuarioService.listar().subscribe({
       next: (usuarios) => {
         this.todos = usuarios.filter(u =>
@@ -102,7 +85,6 @@ export class Asignaciones implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destruirMapa();
     this.destruirMapaPreview();
   }
 
@@ -269,157 +251,5 @@ export class Asignaciones implements OnInit, OnDestroy {
           error: () => this.notificacion.error('No se pudo eliminar la asignación'),
         });
       });
-  }
-
-  // ── Modal "Nuevo invernadero" ─────────────────────────────────
-  private formVacio(): InvernaderoRequest {
-    return { numero: null, nombreCultivo: '', fincaId: null, latitud: null, longitud: null };
-  }
-
-  abrirModalInvernadero(): void {
-    this.formInv = this.formVacio();
-    if (this.fincas.length === 1) this.formInv.fincaId = this.fincas[0].id;
-    this.errorFormInv = '';
-    this.mostrarModalInv = true;
-    // El mapa necesita el contenedor ya renderizado en el DOM.
-    setTimeout(() => this.iniciarMapa(), 0);
-  }
-
-  cerrarModalInvernadero(): void {
-    this.mostrarModalInv = false;
-    this.errorFormInv = '';
-    this.destruirMapa();
-  }
-
-  private iniciarMapa(): void {
-    const centro: L.LatLngTuple =
-      this.formInv.latitud != null && this.formInv.longitud != null
-        ? [this.formInv.latitud, this.formInv.longitud]
-        : this.centroPorDefecto;
-
-    this.mapa = L.map('mapaInvernadero', { center: centro, zoom: 12 });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap',
-    }).addTo(this.mapa);
-
-    this.mapa.on('click', (e: L.LeafletMouseEvent) =>
-      this.ponerMarcador(e.latlng.lat, e.latlng.lng));
-
-    if (this.formInv.latitud != null && this.formInv.longitud != null) {
-      this.ponerMarcador(this.formInv.latitud, this.formInv.longitud);
-    }
-
-    // Leaflet a veces calcula mal el tamaño dentro de un modal recién abierto.
-    setTimeout(() => this.mapa?.invalidateSize(), 120);
-  }
-
-  private ponerMarcador(lat: number, lng: number): void {
-    const pin = L.divIcon({
-      className: 'pin-invernadero',
-      html: '<span class="pin-dot"></span>',
-      iconSize: [22, 22],
-      iconAnchor: [11, 11],
-    });
-
-    if (!this.marcador) {
-      this.marcador = L.marker([lat, lng], { icon: pin, draggable: true }).addTo(this.mapa!);
-      this.marcador.on('dragend', () => {
-        const p = this.marcador!.getLatLng();
-        this.actualizarCoords(p.lat, p.lng);
-      });
-    } else {
-      this.marcador.setLatLng([lat, lng]);
-    }
-    this.actualizarCoords(lat, lng);
-  }
-
-  private actualizarCoords(lat: number, lng: number): void {
-    this.formInv.latitud = this.redondear(lat);
-    this.formInv.longitud = this.redondear(lng);
-    this.cdr.markForCheck();
-  }
-
-  private redondear(n: number): number {
-    return Math.round(n * 1e6) / 1e6; // ~11 cm de precisión, suficiente.
-  }
-
-  // Cuando el usuario escribe las coordenadas a mano, refleja en el mapa.
-  coordsManual(): void {
-    const { latitud, longitud } = this.formInv;
-    if (latitud == null || longitud == null || !this.mapa) return;
-    if (latitud < -90 || latitud > 90 || longitud < -180 || longitud > 180) return;
-    this.ponerMarcador(latitud, longitud);
-    this.mapa.setView([latitud, longitud], Math.max(this.mapa.getZoom(), 14));
-  }
-
-  usarMiUbicacion(): void {
-    if (!navigator.geolocation) {
-      this.notificacion.error('Tu dispositivo no permite geolocalización');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        this.ponerMarcador(latitude, longitude);
-        this.mapa?.setView([latitude, longitude], 15);
-        this.cdr.markForCheck();
-      },
-      () => this.notificacion.error('No se pudo obtener tu ubicación'),
-    );
-  }
-
-  quitarUbicacion(): void {
-    this.formInv.latitud = null;
-    this.formInv.longitud = null;
-    if (this.marcador && this.mapa) {
-      this.mapa.removeLayer(this.marcador);
-      this.marcador = null;
-    }
-    this.cdr.markForCheck();
-  }
-
-  get mapaUrlPreview(): string | null {
-    const { latitud, longitud } = this.formInv;
-    if (latitud == null || longitud == null) return null;
-    return `https://www.google.com/maps?q=${latitud},${longitud}`;
-  }
-
-  private destruirMapa(): void {
-    this.mapa?.remove();
-    this.mapa = null;
-    this.marcador = null;
-  }
-
-  guardarInvernadero(): void {
-    if (this.formInv.numero == null) {
-      this.errorFormInv = 'El número del invernadero es obligatorio.';
-      return;
-    }
-    if (!this.formInv.nombreCultivo?.trim()) {
-      this.errorFormInv = 'El nombre de cultivo es obligatorio.';
-      return;
-    }
-
-    this.guardandoInv = true;
-    this.errorFormInv = '';
-    this.invernaderoService.guardar(this.formInv).subscribe({
-      next: () => {
-        this.guardandoInv = false;
-        this.cerrarModalInvernadero();
-        this.notificacion.exito('Invernadero creado correctamente');
-        this.cargarInvernaderos(); // refresca la lista (incluye nombre de finca)
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.guardandoInv = false;
-        this.errorFormInv = err?.status === 409
-          ? 'Ya existe un invernadero con ese número.'
-          : 'No se pudo crear el invernadero. Revisa los datos.';
-        this.notificacion.error(this.errorFormInv);
-        this.cdr.markForCheck();
-      },
-    });
   }
 }

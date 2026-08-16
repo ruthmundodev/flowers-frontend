@@ -44,6 +44,12 @@ export class Inventario implements OnInit {
   invernaderos: InvernaderoResponse[] = [];
   form: VariedadRequest = this.formVacio();
 
+  // Tipos vienen de la tabla variedad (endpoint). "__OTRO__" abre input libre.
+  tiposInventario: string[] = ['SEMILLA'];
+  readonly OTRO = '__OTRO__';
+  tipoSel = 'SEMILLA';
+  tipoOtro = '';
+
   constructor(
     private inventarioService: InventarioService,
     private variedadService: VariedadService,
@@ -76,8 +82,18 @@ export class Inventario implements OnInit {
   // ── Modal ───────────────────────────────────────────────────
   abrirModal(): void {
     this.form = this.formVacio();
+    this.tipoSel = 'SEMILLA';
+    this.tipoOtro = '';
     this.errorForm = '';
     this.mostrarModal = true;
+
+    this.variedadService.tipos().subscribe({
+      next: (tipos) => {
+        this.tiposInventario = tipos.length ? tipos : ['SEMILLA'];
+        this.cdr.markForCheck();
+      },
+      error: () => { /* deja el fallback ['SEMILLA'] */ },
+    });
 
     if (this.invernaderos.length === 0) {
       this.invernaderoService.listar().subscribe({
@@ -101,6 +117,14 @@ export class Inventario implements OnInit {
       this.errorForm = 'Nombre, número bass, fecha de inicio e invernadero son obligatorios.';
       return;
     }
+
+    // Resolver tipo: opción del selector o valor libre de "Otro".
+    const tipo = this.tipoSel === this.OTRO ? this.tipoOtro.trim().toUpperCase() : this.tipoSel;
+    if (!tipo) {
+      this.errorForm = 'Especifica el tipo de inventario.';
+      return;
+    }
+    this.form.tipo = tipo;
 
     this.guardando = true;
     this.errorForm = '';
@@ -130,6 +154,7 @@ export class Inventario implements OnInit {
       fechaPoda: null,
       invernaderoId: null,
       parental: '',
+      tipo: 'SEMILLA',
     };
   }
 

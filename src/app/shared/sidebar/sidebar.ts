@@ -49,7 +49,7 @@ export class Sidebar implements OnInit {
   mobileOpen      = false;
 
   private static readonly RUTAS_REPORTES = ['/rendimientos', '/parcelas', '/exportar'];
-  private static readonly RUTAS_ADMIN    = ['/usuarios', '/asignaciones'];
+  private static readonly RUTAS_ADMIN    = ['/usuarios', '/invernaderos', '/asignaciones'];
 
   ngOnInit(): void {
     this.invernaderoService.listar().subscribe(data => this.invernaderos.set(data));

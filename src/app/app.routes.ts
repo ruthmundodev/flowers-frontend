@@ -27,4 +27,16 @@ export const routes: Routes = [
   { path: 'anuncios', component: Anuncios, canActivate: [authGuard], data: { modulo: 'Anuncios' } },
   { path: 'asignaciones', component: Asignaciones, canActivate: [authGuard], data: { modulo: 'Asignaciones' } },
   { path: 'usuarios', component: Usuarios, canActivate: [authGuard], data: { modulo: 'Usuarios' } },
+  {
+    path: 'invernaderos',
+    loadComponent: () => import('./invernaderos/invernaderos').then(m => m.Invernaderos),
+    canActivate: [authGuard],
+    data: { modulo: 'Asignaciones' },
+  },
+  {
+    path: 'exportar',
+    loadComponent: () => import('./exportar/exportar').then(m => m.Exportar),
+    canActivate: [authGuard],
+    data: { modulo: 'Inventario' },
+  },
 ];

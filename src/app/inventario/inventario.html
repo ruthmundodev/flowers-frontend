@@ -127,6 +127,19 @@
           </div>
 
           <div class="form-field">
+            <label>Tipo <span class="req">*</span></label>
+            <select [(ngModel)]="tipoSel">
+              <option *ngFor="let t of tiposInventario" [ngValue]="t">{{ t | titlecase }}</option>
+              <option [ngValue]="OTRO">Otro…</option>
+            </select>
+          </div>
+
+          <div class="form-field" *ngIf="tipoSel === OTRO">
+            <label>Nuevo tipo <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="tipoOtro" placeholder="Ej. FRUTA" />
+          </div>
+
+          <div class="form-field">
             <label>Fecha de inicio <span class="req">*</span></label>
             <input type="date" [(ngModel)]="form.fechaInicio" />
           </div>

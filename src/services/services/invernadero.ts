@@ -27,6 +27,10 @@ export class InvernaderoService {
     return this.http.put<InvernaderoResponse>(`${this.apiUrl}/actualizar/${id}`, request);
   }
 
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/eliminar/${id}`);
+  }
+
   setInvernaderoActivo(id: number | null): void {
     if (id == null) {
       localStorage.removeItem('invernaderoId');

@@ -17,6 +17,13 @@ export class VariedadService {
     );
   }
 
+  /** Tipos de inventario existentes en la tabla variedad. */
+  tipos(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/tipos`).pipe(
+      map(data => data ?? [])
+    );
+  }
+
   guardar(request: VariedadRequest): Observable<VariedadResponse> {
     return this.http.post<VariedadResponse>(`${this.apiUrl}/guardar`, request);
   }

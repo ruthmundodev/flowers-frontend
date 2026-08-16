@@ -1,0 +1,60 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <h1>Exportar reportes</h1>
+        <p class="subtitle">Inventario de semillas y de polen por rango de fecha.</p>
+      </div>
+    </header>
+
+    <!-- Filtros -->
+    <section class="filtros">
+      <div class="campo">
+        <label for="desde">Desde</label>
+        <input id="desde" type="date" [(ngModel)]="desde" />
+      </div>
+      <div class="campo">
+        <label for="hasta">Hasta</label>
+        <input id="hasta" type="date" [(ngModel)]="hasta" />
+      </div>
+      <button class="btn btn--primary" (click)="generar()" [disabled]="cargando">
+        <i class="ti ti-report-analytics"></i>
+        {{ cargando ? 'Generando…' : 'Generar' }}
+      </button>
+      <button class="btn btn--pdf" (click)="exportarPdf()" [disabled]="!reporte || cargando">
+        <i class="ti ti-file-type-pdf"></i>
+        Exportar PDF
+      </button>
+    </section>
+
+    <!-- Resultados -->
+    <ng-container *ngIf="reporte as r">
+      <div class="totales">
+        <div class="total-card" *ngFor="let v of vista; let i = index"
+             [style.background]="color(i)">
+          <span class="total-label">Total {{ v.tipo | titlecase }}</span>
+          <span class="total-valor">{{ v.total }}</span>
+        </div>
+        <div class="total-card total-card--general">
+          <span class="total-label">Total general</span>
+          <span class="total-valor">{{ r.totalGeneral }}</span>
+        </div>
+      </div>
+
+      <p class="vacio" *ngIf="!vista.length">Sin registros en el rango seleccionado.</p>
+
+      <div class="graficas">
+        <div class="grafica-card" *ngFor="let v of vista">
+          <h2>{{ v.tipo | titlecase }} por variedad</h2>
+          <canvas #grupoCanvas></canvas>
+        </div>
+      </div>
+    </ng-container>
+
+    <p class="hint" *ngIf="!reporte && !cargando">
+      Elige un rango de fecha y pulsa <strong>Generar</strong>.
+    </p>
+  </main>
+</div>
