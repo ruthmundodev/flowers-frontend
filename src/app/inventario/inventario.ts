@@ -37,6 +37,9 @@ export class Inventario implements OnInit {
   error = false;
   semillas: Semilla[] = [];
 
+  // Vista del inventario del invernadero: Semillas o Polen (variedad.tipo).
+  tipoVista: 'SEMILLA' | 'POLEN' = 'SEMILLA';
+
   // ── Modal "Agregar variedad" ────────────────────────────────
   mostrarModal = false;
   guardando = false;
@@ -62,9 +65,15 @@ export class Inventario implements OnInit {
     this.cargar();
   }
 
+  cambiarVista(tipo: 'SEMILLA' | 'POLEN'): void {
+    if (this.tipoVista === tipo) return;
+    this.tipoVista = tipo;
+    this.cargar();
+  }
+
   cargar(): void {
     this.cargando = true;
-    this.inventarioService.listar().subscribe({
+    this.inventarioService.listar(this.tipoVista).subscribe({
       next: (items) => {
         this.semillas = items.map(item => this.mapToSemilla(item));
         this.cargando = false;
@@ -82,7 +91,8 @@ export class Inventario implements OnInit {
   // ── Modal ───────────────────────────────────────────────────
   abrirModal(): void {
     this.form = this.formVacio();
-    this.tipoSel = 'SEMILLA';
+    // Nueva variedad arranca con el tipo de la vista actual (Semillas o Polen).
+    this.tipoSel = this.tipoVista;
     this.tipoOtro = '';
     this.errorForm = '';
     this.mostrarModal = true;

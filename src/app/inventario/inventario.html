@@ -6,11 +6,11 @@
 
     <!-- TOPBAR -->
     <div class="topbar">
-      <span class="page-title">Inventario de semillas</span>
+      <span class="page-title">Inventario de {{ tipoVista === 'POLEN' ? 'polen' : 'semillas' }}</span>
       <div class="topbar-right">
         <div class="search-box">
           <i class="ti ti-search"></i>
-          <input type="text" placeholder="Buscar semilla..." [(ngModel)]="busqueda" />
+          <input type="text" [placeholder]="tipoVista === 'POLEN' ? 'Buscar polen...' : 'Buscar semilla...'" [(ngModel)]="busqueda" />
         </div>
         <button class="btn-light"><i class="ti ti-filter"></i> Filtrar</button>
         <button class="btn-new" *appPuede="'Inventario:crear'" (click)="abrirModal()"><i class="ti ti-plus"></i> Agregar variedad</button>
@@ -19,6 +19,18 @@
 
     <!-- CONTENT -->
     <div class="content">
+
+      <!-- SWITCH Semillas / Polen (mismo invernadero, filtra por variedad.tipo) -->
+      <div class="tipo-switch">
+        <button class="tipo-tab" [class.active]="tipoVista === 'SEMILLA'"
+                (click)="cambiarVista('SEMILLA')">
+          <i class="ti ti-seeding"></i> Semillas
+        </button>
+        <button class="tipo-tab" [class.active]="tipoVista === 'POLEN'"
+                (click)="cambiarVista('POLEN')">
+          <i class="ti ti-flower"></i> Polen
+        </button>
+      </div>
 
       <!-- KPI CARDS -->
       <div class="kpi-row">
@@ -46,7 +58,7 @@
 
       <!-- TABLE -->
       <div class="sec-header">
-        <span class="sec-title">Todas las semillas</span>
+        <span class="sec-title">{{ tipoVista === 'POLEN' ? 'Todo el polen' : 'Todas las semillas' }}</span>
       </div>
 
       <div class="card">
@@ -86,6 +98,16 @@
                 <td class="text-muted">{{ s.ultimaSiembra }}</td>
                 <td><span class="badge" [ngClass]="badgeClass(s.estado)">{{ s.estado }}</span></td>
               </tr>
+
+              <tr *ngIf="!cargando && semillasFiltradas.length === 0">
+                <td colspan="6" class="empty-row">
+                  <i class="ti ti-flower-off"></i>
+                  No hay {{ tipoVista === 'POLEN' ? 'polen' : 'semillas' }} en este inventario.
+                  <button class="link-add" *appPuede="'Inventario:crear'" (click)="abrirModal()">
+                    Agregar {{ tipoVista === 'POLEN' ? 'polen' : 'variedad' }}
+                  </button>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -98,7 +120,10 @@
   <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <span class="modal-title"><i class="ti ti-plant-2"></i> Agregar variedad</span>
+        <span class="modal-title">
+          <i class="ti ti-plant-2"></i>
+          Agregar variedad{{ tipoVista === 'POLEN' ? ' de polen' : '' }}
+        </span>
         <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
           <i class="ti ti-x"></i>
         </button>

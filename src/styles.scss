@@ -420,3 +420,79 @@ html[data-theme='dark'] {
     color: var(--d-primary-ink) !important;
   }
 }
+
+/* ── Switch Semillas / Polen (Inventario) ─────────────────────── */
+.tipo-switch {
+  display: inline-flex;
+  gap: 4px;
+  background: #e6e1d6;
+  border: 1px solid #dcd7cb;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 18px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .05);
+}
+.tipo-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 128px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #5c6b5d;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.tipo-tab i { font-size: 17px; }
+.tipo-tab:hover:not(.active) { background: rgba(0, 0, 0, .04); color: #1a2e1c; }
+.tipo-tab:focus-visible { outline: 2px solid #1e3320; outline-offset: 2px; }
+.tipo-tab.active {
+  background: #1e3320;
+  color: #eaf3ea;
+  box-shadow: 0 2px 6px rgba(30, 51, 32, .28);
+}
+.tipo-tab.active i { color: #b8d8b8; }
+
+html[data-theme='dark'] .tipo-switch {
+  background: var(--d-surface-2);
+  border-color: var(--d-border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .3);
+}
+html[data-theme='dark'] .tipo-tab { color: var(--d-text-3); }
+html[data-theme='dark'] .tipo-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, .05);
+  color: var(--d-text);
+}
+html[data-theme='dark'] .tipo-tab.active {
+  background: var(--d-primary, #356a3d);
+  color: #eaf3ea;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+}
+html[data-theme='dark'] .tipo-tab.active i { color: #cfe6cf; }
+
+/* ── Fila vacía de inventario ─────────────────────────────────── */
+.inv-table .empty-row {
+  text-align: center;
+  padding: 24px 12px;
+  color: #8a968b;
+  font-size: 14px;
+}
+.inv-table .empty-row i { margin-right: 6px; vertical-align: -1px; }
+.link-add {
+  background: none;
+  border: none;
+  color: #1e3320;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px;
+  font-family: inherit;
+  font-size: 14px;
+}
+.link-add:hover { text-decoration: underline; }
+html[data-theme='dark'] .link-add { color: var(--d-primary-ink, #b8d8b8); }

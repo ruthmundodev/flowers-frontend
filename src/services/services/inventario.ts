@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { InventarioItem } from '../../interfaces/inventario.interfaces';
@@ -11,8 +11,10 @@ export class InventarioService {
 
   constructor(private http: HttpClient) {}
 
-  listar(): Observable<InventarioItem[]> {
-    return this.http.get<InventarioItem[]>(`${this.apiUrl}/listar`).pipe(
+  /** tipo: SEMILLA (default) | POLEN | … Filtra el inventario por variedad.tipo. */
+  listar(tipo: string = 'SEMILLA'): Observable<InventarioItem[]> {
+    const params = new HttpParams().set('tipo', tipo);
+    return this.http.get<InventarioItem[]>(`${this.apiUrl}/listar`, { params }).pipe(
       map(data => data ?? [])
     );
   }
