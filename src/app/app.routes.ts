@@ -34,6 +34,18 @@ export const routes: Routes = [
     data: { modulo: 'Asignaciones' },
   },
   {
+    path: 'parcelas',
+    loadComponent: () => import('./invernaderos/invernaderos').then(m => m.Invernaderos),
+    canActivate: [authGuard],
+    data: { modulo: 'Asignaciones' },
+  },
+  {
+    path: 'siembras',
+    loadComponent: () => import('./siembras/siembras').then(m => m.Siembras),
+    canActivate: [authGuard],
+    data: { modulo: 'Temporada' },
+  },
+  {
     path: 'exportar',
     loadComponent: () => import('./exportar/exportar').then(m => m.Exportar),
     canActivate: [authGuard],

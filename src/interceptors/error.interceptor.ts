@@ -12,7 +12,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      const esLogin = req.url.includes('/api/auth/login');
+      if (error.status === 401 && !esLogin) {
         auth.logout();
         notificacion.error('Tu sesión ha expirado. Por favor inicia sesión de nuevo.');
         router.navigate(['/login']);

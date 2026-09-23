@@ -53,7 +53,7 @@ export class Login implements OnInit {
         this.loading = false;
         if (err.status === 403 && err.error?.message === 'CUENTA_DESACTIVADA') {
           this.errorMessage = 'Tu cuenta está desactivada. Contacta al administrador.';
-        } else if (err.status === 403) {
+        } else if (err.status === 403 || err.status === 401) {
           this.errorMessage = 'Correo o contraseña incorrectos';
         } else {
           this.errorMessage = 'Error al iniciar sesión, intenta de nuevo';

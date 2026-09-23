@@ -1,0 +1,239 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <div class="topbar">
+      <span class="page-title">Siembras</span>
+      <div class="topbar-right">
+        <button class="btn-new" *appPuede="'Temporada:crear'" (click)="abrirCrear()">
+          <i class="ti ti-plus"></i> Nueva siembra
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="card filtros-card">
+        <div class="filtros-grid">
+          <div class="form-field">
+            <label>Invernadero</label>
+            <select [(ngModel)]="filtroInvernaderoId" (ngModelChange)="aplicarFiltros()">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
+                #{{ inv.numero }} — {{ inv.nombreCultivo }}
+              </option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Temporada</label>
+            <select [(ngModel)]="filtroTemporadaId" (ngModelChange)="aplicarFiltros()">
+              <option [ngValue]="null">Todas</option>
+              <option *ngFor="let t of temporadas" [ngValue]="t.id">{{ temporadaLabel(t) }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <i class="ti ti-seeding"></i>
+          <span>Listado de siembras</span>
+        </div>
+
+        <p class="empty" *ngIf="cargando">Cargando…</p>
+        <p class="empty" *ngIf="error && !cargando">Error al cargar las siembras.</p>
+        <p class="empty" *ngIf="!cargando && !error && cultivos.length === 0">
+          No hay siembras registradas. Crea la primera con “Nueva siembra”.
+        </p>
+
+        <div class="table-wrap" *ngIf="!cargando && !error && cultivos.length > 0">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Variedad</th>
+                <th>Invernadero</th>
+                <th>Temporada</th>
+                <th>Fecha siembra</th>
+                <th>Ventana siembra</th>
+                <th>Ventana producción</th>
+                <th>Cantidad</th>
+                <th>Estado</th>
+                <th class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of cultivos">
+                <td class="strong">{{ c.variedadNombre ?? '—' }}</td>
+                <td>{{ c.invernaderoNumero != null ? '#' + c.invernaderoNumero : '—' }}</td>
+                <td>{{ c.temporadaDescripcion ?? '—' }}</td>
+                <td>{{ c.fechaSiembra ? (c.fechaSiembra | date:'dd/MM/yyyy') : '—' }}</td>
+                <td>
+                  <span *ngIf="c.fechaInicioSiembra || c.fechaFinSiembra">
+                    {{ c.fechaInicioSiembra ? (c.fechaInicioSiembra | date:'dd/MM/yyyy') : '—' }}
+                    –
+                    {{ c.fechaFinSiembra ? (c.fechaFinSiembra | date:'dd/MM/yyyy') : '—' }}
+                  </span>
+                  <span *ngIf="!c.fechaInicioSiembra && !c.fechaFinSiembra">—</span>
+                </td>
+                <td>
+                  <span *ngIf="c.fechaInicioProdu || c.fechaFinProdu">
+                    {{ c.fechaInicioProdu ? (c.fechaInicioProdu | date:'dd/MM/yyyy') : '—' }}
+                    –
+                    {{ c.fechaFinProdu ? (c.fechaFinProdu | date:'dd/MM/yyyy') : '—' }}
+                  </span>
+                  <span *ngIf="!c.fechaInicioProdu && !c.fechaFinProdu">—</span>
+                </td>
+                <td>{{ c.cantidad ?? '—' }}</td>
+                <td><span class="badge" [ngClass]="claseEstado(c)">{{ estado(c) }}</span></td>
+                <td class="col-acciones">
+                  <button class="btn-icon" *appPuede="'Rendimientos:crear'"
+                          (click)="abrirCosecha(c)" title="Registrar cosecha">
+                    <i class="ti ti-basket"></i>
+                  </button>
+                  <button class="btn-icon" *appPuede="'Temporada:editar'"
+                          (click)="abrirEditar(c)" title="Editar">
+                    <i class="ti ti-pencil"></i>
+                  </button>
+                  <button class="btn-icon danger" *appPuede="'Temporada:eliminar'"
+                          (click)="eliminar(c)" title="Eliminar">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">
+          <i class="ti ti-seeding"></i>
+          {{ modoEdicion ? 'Editar siembra' : 'Nueva siembra' }}
+        </span>
+        <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Variedad <span class="req">*</span></label>
+            <select [(ngModel)]="form.variedadId">
+              <option [ngValue]="null" disabled>Selecciona una variedad</option>
+              <option *ngFor="let v of variedades" [ngValue]="v.id">{{ v.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Invernadero <span class="req">*</span></label>
+            <select [(ngModel)]="form.invernaderoId">
+              <option [ngValue]="null" disabled>Selecciona un invernadero</option>
+              <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
+                #{{ inv.numero }} — {{ inv.nombreCultivo }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Temporada <span class="opcional">(opcional)</span></label>
+            <select [(ngModel)]="form.temporadaId">
+              <option [ngValue]="null">Sin temporada</option>
+              <option *ngFor="let t of temporadas" [ngValue]="t.id">{{ temporadaLabel(t) }}</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Cantidad <span class="req">*</span></label>
+            <input type="number" min="1" step="1" [(ngModel)]="form.cantidad" placeholder="0" />
+          </div>
+
+          <div class="form-field">
+            <label>Fecha de siembra <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="form.fechaSiembra" />
+          </div>
+
+          <div class="form-field">
+            <label>Ventana siembra — inicio <span class="opcional">(opcional)</span></label>
+            <input type="date" [(ngModel)]="form.fechaInicioSiembra" />
+          </div>
+
+          <div class="form-field">
+            <label>Ventana siembra — fin <span class="opcional">(opcional)</span></label>
+            <input type="date" [(ngModel)]="form.fechaFinSiembra" />
+          </div>
+        </div>
+
+        <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
+        <button class="btn-new" (click)="guardar()" [disabled]="guardando">
+          <i class="ti ti-check"></i>
+          {{ guardando ? 'Guardando…' : (modoEdicion ? 'Guardar cambios' : 'Crear siembra') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="mostrarModalCosecha" (click)="cerrarModalCosecha()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">
+          <i class="ti ti-basket"></i>
+          Registrar cosecha
+        </span>
+        <button class="modal-close" (click)="cerrarModalCosecha()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="cosecha-sub">{{ cultivoCosechaLabel }}</p>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Fecha de cosecha <span class="req">*</span></label>
+            <input type="date" [(ngModel)]="formCosecha.fechaCosecha" />
+          </div>
+
+          <div class="form-field">
+            <label>Número de bancos <span class="req">*</span></label>
+            <input type="number" min="0" placeholder="0" [(ngModel)]="formCosecha.numeroBancos" />
+          </div>
+
+          <div class="form-field">
+            <label>Rendimiento total (kg) <span class="req">*</span></label>
+            <input type="number" min="0" step="0.01" placeholder="0.00" [(ngModel)]="formCosecha.rendimientoTotal" />
+          </div>
+
+          <div class="form-field">
+            <label>Ventana producción — inicio <span class="opcional">(opcional)</span></label>
+            <input type="date" [(ngModel)]="formCosecha.fechaInicioProdu" />
+          </div>
+
+          <div class="form-field">
+            <label>Ventana producción — fin <span class="opcional">(opcional)</span></label>
+            <input type="date" [(ngModel)]="formCosecha.fechaFinProdu" />
+          </div>
+        </div>
+
+        <p class="form-error" *ngIf="errorCosecha">{{ errorCosecha }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModalCosecha()" [disabled]="guardandoCosecha">Cancelar</button>
+        <button class="btn-new" (click)="guardarCosecha()" [disabled]="guardandoCosecha">
+          <i class="ti ti-check"></i>
+          {{ guardandoCosecha ? 'Guardando…' : 'Registrar cosecha' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -19,6 +19,22 @@
         <label for="hasta">Hasta</label>
         <input id="hasta" type="date" [(ngModel)]="hasta" />
       </div>
+      <div class="campo">
+        <label for="tipo">Tipo</label>
+        <select id="tipo" [(ngModel)]="tipoSel">
+          <option [ngValue]="null">Todos</option>
+          <option *ngFor="let t of tipos" [ngValue]="t">{{ t | titlecase }}</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="inv">Invernadero</label>
+        <select id="inv" [(ngModel)]="invernaderoSel">
+          <option [ngValue]="null">Todos</option>
+          <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
+            #{{ inv.numero }} — {{ inv.nombreCultivo }}
+          </option>
+        </select>
+      </div>
       <button class="btn btn--primary" (click)="generar()" [disabled]="cargando">
         <i class="ti ti-report-analytics"></i>
         {{ cargando ? 'Generando…' : 'Generar' }}
@@ -43,12 +59,31 @@
         </div>
       </div>
 
+      <div class="guardar-bar" *ngIf="vista.length">
+        <input class="guardar-desc" type="text" [(ngModel)]="descripcion"
+               placeholder="Descripción (opcional) para el histórico" />
+        <button class="btn btn--save" (click)="guardar()" [disabled]="guardando">
+          <i class="ti ti-device-floppy"></i>
+          {{ guardando ? 'Guardando…' : 'Guardar en histórico' }}
+        </button>
+      </div>
+
       <p class="vacio" *ngIf="!vista.length">Sin registros en el rango seleccionado.</p>
 
       <div class="graficas">
         <div class="grafica-card" *ngFor="let v of vista">
           <h2>{{ v.tipo | titlecase }} por variedad</h2>
           <canvas #grupoCanvas></canvas>
+
+          <div class="desglose" *ngIf="v.porInvernadero.length">
+            <h3>Por invernadero</h3>
+            <table class="desglose-tabla">
+              <tr *ngFor="let d of v.porInvernadero">
+                <td>{{ d.invernadero }}</td>
+                <td class="num">{{ d.cantidad }}</td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
     </ng-container>
@@ -56,5 +91,51 @@
     <p class="hint" *ngIf="!reporte && !cargando">
       Elige un rango de fecha y pulsa <strong>Generar</strong>.
     </p>
+
+    <section class="historico">
+      <div class="historico-head">
+        <h2><i class="ti ti-history"></i> Histórico de reportes</h2>
+        <button class="btn btn--light" (click)="cargarGuardados()" [disabled]="cargandoGuardados">
+          <i class="ti ti-refresh"></i> Actualizar
+        </button>
+      </div>
+
+      <p class="vacio" *ngIf="!cargandoGuardados && !guardados.length">
+        Aún no hay reportes guardados.
+      </p>
+
+      <table class="hist-tabla" *ngIf="guardados.length">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Rango</th>
+            <th>Tipo</th>
+            <th>Invernadero</th>
+            <th>Total</th>
+            <th>Descripción</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of guardados">
+            <td>{{ g.fecha }}</td>
+            <td>{{ g.desde }} → {{ g.hasta }}</td>
+            <td>{{ g.tipo ? (g.tipo | titlecase) : 'Todos' }}</td>
+            <td>{{ g.invernaderoNombre ?? 'Todos' }}</td>
+            <td class="num">{{ g.totalGeneral }}</td>
+            <td class="desc">{{ g.descripcion || '—' }}</td>
+            <td class="acciones">
+              <button class="icon-btn" title="Abrir" (click)="abrirGuardado(g)">
+                <i class="ti ti-eye"></i>
+              </button>
+              <button class="icon-btn icon-btn--danger" title="Eliminar"
+                      (click)="eliminarGuardado(g)">
+                <i class="ti ti-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </main>
 </div>

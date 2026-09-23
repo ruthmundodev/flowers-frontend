@@ -28,3 +28,28 @@ export interface AgregadoVariedad {
   variedad: string;
   cantidad: number;
 }
+
+export interface ReporteGuardarRequest {
+  desde: string;
+  hasta: string;
+  tipo?: string | null;
+  invernaderoId?: number | null;
+  descripcion?: string | null;
+  observaciones?: string | null;
+}
+
+export interface ReporteGuardado {
+  id: number;
+  fecha: string;
+  desde: string;
+  hasta: string;
+  tipo: string | null;
+  invernaderoId: number | null;
+  invernaderoNombre: string | null;
+  totalGeneral: number;
+  descripcion: string | null;
+  observaciones: string | null;
+  createdAt: string | null;
+  createdBy: number | null;
+  reporte?: ReporteInventario | null;
+}

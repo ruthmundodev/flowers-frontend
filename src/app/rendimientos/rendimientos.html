@@ -89,8 +89,10 @@
             <thead>
               <tr>
                 <th>Variedad</th>
+                <th style="width:120px">Invernadero</th>
                 <th style="width:160px">Número de bancos</th>
                 <th style="width:200px">Rendimiento total (kg)</th>
+                <th style="width:130px">Fecha cosecha</th>
                 <th style="width:100px">Acciones</th>
               </tr>
             </thead>
@@ -102,8 +104,10 @@
                     <span class="seed-title">{{ r.nombreVariedad ?? '—' }}</span>
                   </div>
                 </td>
+                <td class="text-muted">{{ r.invernaderoNumero != null ? '#' + r.invernaderoNumero : '—' }}</td>
                 <td class="text-muted">{{ r.numeroBancos }}</td>
                 <td class="stock-val">{{ r.rendimientoTotal | number:'1.0-2' }} kg</td>
+                <td class="text-muted">{{ r.fechaCosecha ? (r.fechaCosecha | date:'dd/MM/yyyy') : '—' }}</td>
                 <td>
                   <div class="action-btns">
                     <button class="btn-action btn-action--edit" *appPuede="'Rendimientos:editar'" (click)="editar(r)" title="Editar">
@@ -116,7 +120,7 @@
                 </td>
               </tr>
               <tr *ngIf="rendimientos.length === 0">
-                <td colspan="4" class="empty-row">No hay rendimientos registrados</td>
+                <td colspan="6" class="empty-row">No hay rendimientos registrados</td>
               </tr>
             </tbody>
           </table>

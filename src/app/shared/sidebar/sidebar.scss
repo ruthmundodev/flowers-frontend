@@ -160,53 +160,194 @@
   margin-top: 16px;
 }
 
-.inv-select-wrapper {
+.inv-selector {
   position: relative;
+}
+
+.inv-trigger {
   display: flex;
   align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: #16281a;
+  border: 1px solid #2a4a2c;
+  border-radius: 10px;
+  padding: 7px 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 160ms ease-out;
 
-  .inv-icon {
-    position: absolute;
-    left: 10px;
-    font-size: 14px;
-    color: #5a8a5a;
-    pointer-events: none;
-    z-index: 1;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: #1a3220;
+      border-color: #3a6a3e;
+    }
   }
 
-  .inv-chevron {
-    position: absolute;
-    right: 10px;
-    font-size: 13px;
-    color: #5a8a5a;
-    pointer-events: none;
-    transition: color 0.15s;
-  }
+  &:active { transform: scale(0.97); }
 
-  &:focus-within {
-    .inv-icon, .inv-chevron { color: #7ec47e; }
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #1a2e1c, 0 0 0 4px #7ec47e;
   }
 }
 
-.farm-select {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: #c8e8c8;
+.inv-trigger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(126, 196, 126, 0.14);
+  color: #7ec47e;
+  flex-shrink: 0;
+
+  i { font-size: 15px; }
+}
+
+.inv-trigger-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 1px;
+}
+
+.inv-trigger-label {
+  font-size: 10px;
+  color: #5a8a5a;
+  letter-spacing: 0.03em;
+}
+
+.inv-trigger-value {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e8f5e8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inv-trigger-chevron {
+  font-size: 14px;
+  color: #5a8a5a;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+
+  &--open { transform: rotate(180deg); }
+}
+
+.inv-popover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
   background: #16281a;
   border: 1px solid #2a4a2c;
-  border-radius: 8px;
-  padding: 8px 32px 8px 30px;
-  width: 100%;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: border-color 0.18s ease, background 0.18s ease;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  padding: 6px;
+  transform-origin: bottom center;
+  opacity: 0;
+  transform: scale(0.96) translateY(4px);
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 40;
 
-  &:hover  { border-color: #3a6a3e; background: #1a3220; }
-  &:focus  { border-color: #7ec47e; background: #1e3a22; }
-  option   { color: #1a2e1c; background: #fff; }
+  &.open {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+    transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+                transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+}
+
+.inv-popover-list {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inv-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #b8d8b8;
+  font-size: 12.5px;
+  outline: none;
+  transition: background 0.1s, color 0.1s;
+
+  &:hover,
+  &--highlighted {
+    background: #243d26;
+    color: #e8f5e8;
+  }
+
+  &--active {
+    background: #2a4a2e;
+    color: #e8f5e8;
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px #7ec47e;
+  }
+}
+
+.inv-option-icon {
+  font-size: 14px;
+  color: #7ec47e;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.inv-option-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.inv-option-chip {
+  background: #3a6a3e;
+  color: #cfe8cf;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.inv-option-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inv-option-check {
+  font-size: 14px;
+  color: #7ec47e;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-trigger,
+  .inv-trigger-chevron,
+  .inv-popover {
+    transition-property: opacity !important;
+  }
+  .inv-trigger:active { transform: none; }
+  .inv-popover { transform: none !important; }
 }
 
 // ── Botón hamburguesa (solo móvil) ────────────────────────────
