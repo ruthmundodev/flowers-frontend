@@ -35,9 +35,9 @@ export const routes: Routes = [
   },
   {
     path: 'parcelas',
-    loadComponent: () => import('./invernaderos/invernaderos').then(m => m.Invernaderos),
+    loadComponent: () => import('./parcelas/parcelas').then(m => m.Parcelas),
     canActivate: [authGuard],
-    data: { modulo: 'Asignaciones' },
+    data: { modulo: 'Temporada' },
   },
   {
     path: 'siembras',

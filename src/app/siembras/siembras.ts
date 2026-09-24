@@ -11,11 +11,13 @@ import { CultivoService } from '../../services/services/cultivo';
 import { InvernaderoService } from '../../services/services/invernadero';
 import { TemporadaService } from '../../services/services/temporada';
 import { VariedadService } from '../../services/services/variedad';
+import { ParcelaService } from '../../services/services/parcela';
 import { NotificacionService } from '../../services/services/notificacion';
 import { CosechaRequest, CultivoRequest, CultivoResponse } from '../../interfaces/cultivo.interfaces';
 import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
 import { TemporadaResponse } from '../../interfaces/temporada.interfaces';
 import { VariedadResponse } from '../../interfaces/variedad.interfaces';
+import { ParcelaResponse } from '../../interfaces/parcela.interfaces';
 
 type EstadoSiembra = 'Sembrado' | 'En producción' | 'Cosechado';
 
@@ -36,6 +38,8 @@ export class Siembras implements OnInit {
 
   filtroInvernaderoId: number | null = null;
   filtroTemporadaId: number | null = null;
+  filtroParcelaId: number | null = null;
+  parcelasFiltro: ParcelaResponse[] = [];
 
   mostrarModal = false;
   modoEdicion = false;
@@ -43,6 +47,9 @@ export class Siembras implements OnInit {
   guardando = false;
   errorForm = '';
   form: CultivoRequest = this.formVacio();
+  parcelasModal: ParcelaResponse[] = [];
+  cargandoParcelasModal = false;
+  bancosActualesEdicion = 0;
 
   mostrarModalCosecha = false;
   cultivoCosechaId: number | null = null;
@@ -58,6 +65,7 @@ export class Siembras implements OnInit {
     private invernaderoService: InvernaderoService,
     private temporadaService: TemporadaService,
     private variedadService: VariedadService,
+    private parcelaService: ParcelaService,
     private notificacion: NotificacionService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -81,7 +89,7 @@ export class Siembras implements OnInit {
 
   private cargar(): void {
     this.cargando = true;
-    this.cultivoService.listar(this.filtroInvernaderoId, this.filtroTemporadaId).subscribe({
+    this.cultivoService.listar(this.filtroInvernaderoId, this.filtroTemporadaId, this.filtroParcelaId).subscribe({
       next: (data) => {
         this.cultivos = data;
         this.cargando = false;
@@ -99,6 +107,23 @@ export class Siembras implements OnInit {
 
   aplicarFiltros(): void {
     this.cargar();
+  }
+
+  onFiltroInvernaderoChange(): void {
+    this.filtroParcelaId = null;
+    this.parcelasFiltro = [];
+    if (this.filtroInvernaderoId == null) {
+      this.aplicarFiltros();
+      return;
+    }
+    this.parcelaService.listar(this.filtroInvernaderoId).subscribe({
+      next: (data) => {
+        this.parcelasFiltro = data;
+        this.cdr.markForCheck();
+      },
+      error: () => this.notificacion.error('Error al cargar las parcelas'),
+    });
+    this.aplicarFiltros();
   }
 
   temporadaLabel(t: TemporadaResponse): string {
@@ -142,6 +167,8 @@ export class Siembras implements OnInit {
     return {
       variedadId: null,
       invernaderoId: this.filtroInvernaderoId ?? null,
+      parcelaId: null,
+      bancos: null,
       temporadaId: this.filtroTemporadaId ?? null,
       fechaSiembra: this.hoyStr(),
       fechaInicioSiembra: null,
@@ -157,7 +184,10 @@ export class Siembras implements OnInit {
     this.editId = null;
     this.form = this.formVacio();
     this.errorForm = '';
+    this.parcelasModal = [];
+    this.bancosActualesEdicion = 0;
     this.mostrarModal = true;
+    if (this.form.invernaderoId != null) this.onInvernaderoModalChange(true);
   }
 
   abrirEditar(c: CultivoResponse): void {
@@ -166,6 +196,8 @@ export class Siembras implements OnInit {
     this.form = {
       variedadId: c.variedadId ?? null,
       invernaderoId: c.invernaderoId ?? null,
+      parcelaId: c.parcelaId ?? null,
+      bancos: c.bancos ?? null,
       temporadaId: c.temporadaId ?? null,
       fechaSiembra: c.fechaSiembra ?? '',
       fechaInicioSiembra: c.fechaInicioSiembra ?? null,
@@ -175,7 +207,45 @@ export class Siembras implements OnInit {
       cantidad: c.cantidad ?? null,
     };
     this.errorForm = '';
+    this.parcelasModal = [];
+    this.bancosActualesEdicion = c.bancos ?? 0;
     this.mostrarModal = true;
+    if (this.form.invernaderoId != null) this.onInvernaderoModalChange(true);
+  }
+
+  onInvernaderoModalChange(mantenerParcela = false): void {
+    if (!mantenerParcela) this.form.parcelaId = null;
+    this.parcelasModal = [];
+    if (this.form.invernaderoId == null) return;
+    this.cargandoParcelasModal = true;
+    this.parcelaService.listar(this.form.invernaderoId).subscribe({
+      next: (data) => {
+        this.parcelasModal = data.filter(p => p.activo);
+        this.cargandoParcelasModal = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.cargandoParcelasModal = false;
+        this.notificacion.error('Error al cargar las parcelas del invernadero');
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  parcelaLabel(p: ParcelaResponse): string {
+    const libres = p.numeroBancos == null ? 'sin límite' : `${p.bancosLibres ?? 0} libres`;
+    return `${p.nombre} · ${libres}`;
+  }
+
+  get parcelaSeleccionadaModal(): ParcelaResponse | null {
+    return this.parcelasModal.find(p => p.id === this.form.parcelaId) ?? null;
+  }
+
+  get bancosLibresModal(): number | null {
+    const p = this.parcelaSeleccionadaModal;
+    if (!p || p.numeroBancos == null) return null;
+    const libres = p.bancosLibres ?? 0;
+    return this.modoEdicion ? libres + this.bancosActualesEdicion : libres;
   }
 
   cerrarModal(): void {
@@ -190,6 +260,18 @@ export class Siembras implements OnInit {
     }
     if (this.form.variedadId == null) {
       this.errorForm = 'La variedad es obligatoria.';
+      return;
+    }
+    if (this.form.parcelaId == null) {
+      this.errorForm = 'La parcela es obligatoria.';
+      return;
+    }
+    if (this.form.bancos != null && this.form.bancos <= 0) {
+      this.errorForm = 'Los bancos deben ser mayor a 0.';
+      return;
+    }
+    if (this.form.bancos != null && this.bancosLibresModal != null && this.form.bancos > this.bancosLibresModal) {
+      this.errorForm = `La parcela no tiene suficientes bancos libres (libres: ${this.bancosLibresModal}).`;
       return;
     }
     if (!this.form.fechaSiembra) {

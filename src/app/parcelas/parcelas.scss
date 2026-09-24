@@ -87,6 +87,26 @@
   .col-acciones { text-align: right; white-space: nowrap; }
 }
 
+.ocupacion { display: flex; align-items: center; gap: 8px; }
+.ocupacion-bar {
+  width: 70px;
+  height: 6px;
+  border-radius: 4px;
+  background: #ece8df;
+  overflow: hidden;
+}
+.ocupacion-fill { height: 100%; background: #1e3320; }
+.ocupacion-txt { font-size: 12px; color: #555; }
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #333;
+  input { width: 16px; height: 16px; }
+}
+
 .btn-icon {
   display: inline-flex;
   align-items: center;
@@ -115,10 +135,8 @@
   white-space: nowrap;
   display: inline-block;
 
-  &--green  { background: #EAF3DE; color: #27500A; }
-  &--yellow { background: #FAEEDA; color: #633806; }
-  &--red    { background: #FCEBEB; color: #791F1F; }
-  &--gray   { background: #f0ede6; color: #5F5E5A; }
+  &--green { background: #EAF3DE; color: #27500A; }
+  &--gray  { background: #f0ede6; color: #5F5E5A; }
 }
 
 .btn-new {
@@ -173,7 +191,7 @@
   background: #fff;
   border-radius: 14px;
   width: 100%;
-  max-width: 640px;
+  max-width: 560px;
   max-height: 92vh;
   display: flex;
   flex-direction: column;
@@ -251,19 +269,6 @@
 .req { color: #c0392b; }
 .opcional { color: #999; font-weight: 400; }
 .form-error { margin-top: 14px; color: #c0392b; font-size: 13px; }
-.hint { font-size: 11px; color: #777; }
-.aviso {
-  font-size: 11px;
-  color: #8a5a1a;
-  a { color: #1e3320; font-weight: 600; }
-}
-
-.cosecha-sub {
-  font-size: 13px;
-  font-weight: 500;
-  color: #1a2e1c;
-  margin-bottom: 14px;
-}
 
 :host-context(html[data-theme="dark"]) {
   background: #14211a;
@@ -278,6 +283,10 @@
   .inv-table td { border-color: var(--d-border); }
   .inv-table tbody tr:hover { background: var(--d-surface-3); }
 
+  .ocupacion-bar { background: var(--d-surface-3); }
+  .ocupacion-txt { color: var(--d-text-3); }
+  .toggle { color: var(--d-text-2); }
+
   .btn-icon {
     background: var(--d-surface-2);
     border-color: var(--d-border-2);
@@ -286,9 +295,6 @@
     &.danger { color: #e78c84; border-color: var(--d-border-2); }
   }
   .empty { color: var(--d-text-3); }
-  .cosecha-sub { color: var(--d-text); }
-  .hint { color: var(--d-text-3); }
-  .aviso a { color: var(--d-text); }
 }
 
 @media (max-width: 640px) {

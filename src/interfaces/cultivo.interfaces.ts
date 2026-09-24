@@ -13,11 +13,16 @@ export interface CultivoResponse {
   invernaderoNumero?: number | null;
   temporadaId?: number | null;
   temporadaDescripcion?: string | null;
+  parcelaId?: number | null;
+  parcelaNombre?: string | null;
+  bancos?: number | null;
 }
 
 export interface CultivoRequest {
   variedadId: number | null;
   invernaderoId: number | null;
+  parcelaId: number | null;
+  bancos: number | null;
   temporadaId: number | null;
   fechaSiembra: string;
   fechaInicioSiembra: string | null;

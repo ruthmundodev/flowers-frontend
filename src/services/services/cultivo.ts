@@ -12,10 +12,11 @@ export class CultivoService {
 
   constructor(private http: HttpClient) {}
 
-  listar(invernaderoId?: number | null, temporadaId?: number | null): Observable<CultivoResponse[]> {
+  listar(invernaderoId?: number | null, temporadaId?: number | null, parcelaId?: number | null): Observable<CultivoResponse[]> {
     let params = new HttpParams();
     if (invernaderoId != null) params = params.set('invernaderoId', invernaderoId);
     if (temporadaId != null) params = params.set('temporadaId', temporadaId);
+    if (parcelaId != null) params = params.set('parcelaId', parcelaId);
     return this.http.get<CultivoResponse[]>(`${this.apiUrl}/listar`, { params }).pipe(
       map(data => data ?? [])
     );

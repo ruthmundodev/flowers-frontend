@@ -50,6 +50,10 @@
       <i class="ti ti-seeding"></i>
       <span>Siembras</span>
     </a>
+    <a class="nav-item" routerLink="/parcelas" routerLinkActive="active" *ngIf="puedeVer('Temporada')">
+      <i class="ti ti-layout-grid"></i>
+      <span>Parcelas</span>
+    </a>
     <a class="nav-item" routerLink="/anuncios" routerLinkActive="active" *ngIf="puedeVer('Anuncios')">
       <i class="ti ti-speakerphone"></i>
       <span>Anuncios</span>

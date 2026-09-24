@@ -1,0 +1,154 @@
+<div class="app-shell">
+  <app-sidebar />
+
+  <main class="main">
+
+    <div class="topbar">
+      <span class="page-title">Parcelas</span>
+      <div class="topbar-right">
+        <button class="btn-new" *appPuede="'Temporada:crear'" (click)="abrirCrear()">
+          <i class="ti ti-plus"></i> Nueva parcela
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="card filtros-card">
+        <div class="filtros-grid">
+          <div class="form-field">
+            <label>Invernadero</label>
+            <select [(ngModel)]="filtroInvernaderoId" (ngModelChange)="aplicarFiltros()">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
+                #{{ inv.numero }} — {{ inv.nombreCultivo }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <i class="ti ti-layout-grid"></i>
+          <span>Listado de parcelas</span>
+        </div>
+
+        <p class="empty" *ngIf="cargando">Cargando…</p>
+        <p class="empty" *ngIf="error && !cargando">Error al cargar las parcelas.</p>
+        <p class="empty" *ngIf="!cargando && !error && parcelas.length === 0">
+          No hay parcelas registradas. Crea la primera con “Nueva parcela”.
+        </p>
+
+        <div class="table-wrap" *ngIf="!cargando && !error && parcelas.length > 0">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Invernadero</th>
+                <th>Parcela</th>
+                <th>Bancos totales</th>
+                <th>Ocupados</th>
+                <th>Libres</th>
+                <th>Ocupación</th>
+                <th>Estado</th>
+                <th class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of parcelas">
+                <td>
+                  {{ p.invernaderoNumero != null ? '#' + p.invernaderoNumero : '—' }}
+                  {{ p.invernaderoNombre ? ' ' + p.invernaderoNombre : '' }}
+                </td>
+                <td class="strong">{{ p.nombre }}</td>
+                <td>{{ p.numeroBancos ?? '—' }}</td>
+                <td>{{ p.bancosOcupados }}</td>
+                <td>{{ p.bancosLibres ?? '—' }}</td>
+                <td>
+                  <div class="ocupacion" *ngIf="p.numeroBancos != null && p.numeroBancos > 0; else sinLimite">
+                    <div class="ocupacion-bar">
+                      <div class="ocupacion-fill" [style.width.%]="porcentajeOcupacion(p)"></div>
+                    </div>
+                    <span class="ocupacion-txt">{{ porcentajeOcupacion(p) }}%</span>
+                  </div>
+                  <ng-template #sinLimite><span>—</span></ng-template>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="p.activo ? 'badge--green' : 'badge--gray'">
+                    {{ p.activo ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </td>
+                <td class="col-acciones">
+                  <button class="btn-icon" *appPuede="'Temporada:editar'"
+                          (click)="abrirEditar(p)" title="Editar">
+                    <i class="ti ti-pencil"></i>
+                  </button>
+                  <button class="btn-icon danger" *appPuede="'Temporada:eliminar'"
+                          (click)="eliminar(p)" title="Eliminar">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">
+          <i class="ti ti-layout-grid"></i>
+          {{ modoEdicion ? 'Editar parcela' : 'Nueva parcela' }}
+        </span>
+        <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Invernadero <span class="req">*</span></label>
+            <select [(ngModel)]="form.invernaderoId">
+              <option [ngValue]="null" disabled>Selecciona un invernadero</option>
+              <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
+                #{{ inv.numero }} — {{ inv.nombreCultivo }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Nombre <span class="req">*</span></label>
+            <input type="text" maxlength="100" [(ngModel)]="form.nombre" placeholder="Ej. Parcela A" />
+          </div>
+
+          <div class="form-field">
+            <label>Número de bancos <span class="opcional">(opcional)</span></label>
+            <input type="number" min="0" step="1" [(ngModel)]="form.numeroBancos" placeholder="Sin límite" />
+          </div>
+
+          <div class="form-field" *ngIf="modoEdicion">
+            <label>Estado</label>
+            <label class="toggle">
+              <input type="checkbox" [(ngModel)]="form.activo" />
+              <span>{{ form.activo ? 'Activa' : 'Inactiva' }}</span>
+            </label>
+          </div>
+        </div>
+
+        <p class="form-error" *ngIf="errorForm">{{ errorForm }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
+        <button class="btn-new" (click)="guardar()" [disabled]="guardando">
+          <i class="ti ti-check"></i>
+          {{ guardando ? 'Guardando…' : (modoEdicion ? 'Guardar cambios' : 'Crear parcela') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

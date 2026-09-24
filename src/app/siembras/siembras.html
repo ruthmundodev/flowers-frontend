@@ -18,11 +18,18 @@
         <div class="filtros-grid">
           <div class="form-field">
             <label>Invernadero</label>
-            <select [(ngModel)]="filtroInvernaderoId" (ngModelChange)="aplicarFiltros()">
+            <select [(ngModel)]="filtroInvernaderoId" (ngModelChange)="onFiltroInvernaderoChange()">
               <option [ngValue]="null">Todos</option>
               <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
                 #{{ inv.numero }} — {{ inv.nombreCultivo }}
               </option>
+            </select>
+          </div>
+          <div class="form-field" *ngIf="filtroInvernaderoId != null">
+            <label>Parcela</label>
+            <select [(ngModel)]="filtroParcelaId" (ngModelChange)="aplicarFiltros()">
+              <option [ngValue]="null">Todas</option>
+              <option *ngFor="let p of parcelasFiltro" [ngValue]="p.id">{{ p.nombre }}</option>
             </select>
           </div>
           <div class="form-field">
@@ -53,6 +60,8 @@
               <tr>
                 <th>Variedad</th>
                 <th>Invernadero</th>
+                <th>Parcela</th>
+                <th>Bancos</th>
                 <th>Temporada</th>
                 <th>Fecha siembra</th>
                 <th>Ventana siembra</th>
@@ -66,6 +75,8 @@
               <tr *ngFor="let c of cultivos">
                 <td class="strong">{{ c.variedadNombre ?? '—' }}</td>
                 <td>{{ c.invernaderoNumero != null ? '#' + c.invernaderoNumero : '—' }}</td>
+                <td>{{ c.parcelaNombre ?? '—' }}</td>
+                <td>{{ c.bancos ?? '—' }}</td>
                 <td>{{ c.temporadaDescripcion ?? '—' }}</td>
                 <td>{{ c.fechaSiembra ? (c.fechaSiembra | date:'dd/MM/yyyy') : '—' }}</td>
                 <td>
@@ -132,12 +143,30 @@
 
           <div class="form-field">
             <label>Invernadero <span class="req">*</span></label>
-            <select [(ngModel)]="form.invernaderoId">
+            <select [(ngModel)]="form.invernaderoId" (ngModelChange)="onInvernaderoModalChange()">
               <option [ngValue]="null" disabled>Selecciona un invernadero</option>
               <option *ngFor="let inv of invernaderos" [ngValue]="inv.id">
                 #{{ inv.numero }} — {{ inv.nombreCultivo }}
               </option>
             </select>
+          </div>
+
+          <div class="form-field">
+            <label>Parcela <span class="req">*</span></label>
+            <select [(ngModel)]="form.parcelaId" [disabled]="form.invernaderoId == null">
+              <option [ngValue]="null" disabled>Selecciona una parcela</option>
+              <option *ngFor="let p of parcelasModal" [ngValue]="p.id">{{ parcelaLabel(p) }}</option>
+            </select>
+            <p class="hint" *ngIf="bancosLibresModal != null">Libres: {{ bancosLibresModal }}</p>
+            <p class="aviso" *ngIf="form.invernaderoId != null && !cargandoParcelasModal && parcelasModal.length === 0">
+              Este invernadero no tiene parcelas activas.
+              <a routerLink="/parcelas">Crear parcela</a>
+            </p>
+          </div>
+
+          <div class="form-field">
+            <label>Bancos <span class="opcional">(opcional)</span></label>
+            <input type="number" min="1" step="1" [(ngModel)]="form.bancos" placeholder="—" />
           </div>
 
           <div class="form-field">
