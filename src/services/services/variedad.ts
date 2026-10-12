@@ -27,4 +27,12 @@ export class VariedadService {
   guardar(request: VariedadRequest): Observable<VariedadResponse> {
     return this.http.post<VariedadResponse>(`${this.apiUrl}/guardar`, request);
   }
+
+  buscar(id: number): Observable<VariedadResponse> {
+    return this.http.get<VariedadResponse>(`${this.apiUrl}/buscar/${id}`);
+  }
+
+  actualizar(id: number, request: VariedadRequest): Observable<VariedadResponse> {
+    return this.http.put<VariedadResponse>(`${this.apiUrl}/actualizar/${id}`, request);
+  }
 }

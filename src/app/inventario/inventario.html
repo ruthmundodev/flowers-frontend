@@ -72,6 +72,7 @@
                 <th>Nivel</th>
                 <th>Últ. siembra</th>
                 <th>Estado</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -97,10 +98,15 @@
                 </td>
                 <td class="text-muted">{{ s.ultimaSiembra }}</td>
                 <td><span class="badge" [ngClass]="badgeClass(s.estado)">{{ s.estado }}</span></td>
+                <td class="col-acciones">
+                  <button class="btn-icon" *appPuede="'Inventario:editar'" (click)="editar(s)" aria-label="Editar" title="Editar">
+                    <i class="ti ti-pencil"></i>
+                  </button>
+                </td>
               </tr>
 
               <tr *ngIf="!cargando && semillasFiltradas.length === 0">
-                <td colspan="6" class="empty-row">
+                <td colspan="7" class="empty-row">
                   <i class="ti ti-flower-off"></i>
                   No hay {{ tipoVista === 'POLEN' ? 'polen' : 'semillas' }} en este inventario.
                   <button class="link-add" *appPuede="'Inventario:crear'" (click)="abrirModal()">
@@ -122,7 +128,7 @@
       <div class="modal-header">
         <span class="modal-title">
           <i class="ti ti-plant-2"></i>
-          Agregar variedad{{ tipoVista === 'POLEN' ? ' de polen' : '' }}
+          {{ editandoId != null ? 'Editar variedad' : 'Agregar variedad' + (tipoVista === 'POLEN' ? ' de polen' : '') }}
         </span>
         <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">
           <i class="ti ti-x"></i>
@@ -191,7 +197,7 @@
       <div class="modal-footer">
         <button class="btn-light" (click)="cerrarModal()" [disabled]="guardando">Cancelar</button>
         <button class="btn-new" (click)="guardarVariedad()" [disabled]="guardando">
-          <i class="ti ti-check"></i> {{ guardando ? 'Guardando…' : 'Guardar variedad' }}
+          <i class="ti ti-check"></i> {{ guardando ? 'Guardando…' : (editandoId != null ? 'Guardar cambios' : 'Guardar variedad') }}
         </button>
       </div>
     </div>

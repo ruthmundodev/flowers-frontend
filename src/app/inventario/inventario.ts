@@ -13,6 +13,7 @@ import { InvernaderoResponse } from '../../interfaces/invernadero.interfaces';
 import { PuedeDirective } from '../../directives/puede.directive';
 
 export interface Semilla {
+  variedadId: number;
   icono: string;
   iconoBg: string;
   nombre: string;
@@ -52,6 +53,7 @@ export class Inventario implements OnInit {
   readonly OTRO = '__OTRO__';
   tipoSel = 'SEMILLA';
   tipoOtro = '';
+  editandoId: number | null = null;
 
   constructor(
     private inventarioService: InventarioService,
@@ -90,19 +92,60 @@ export class Inventario implements OnInit {
 
   // ── Modal ───────────────────────────────────────────────────
   abrirModal(): void {
+    this.editandoId = null;
     this.form = this.formVacio();
-    // Nueva variedad arranca con el tipo de la vista actual (Semillas o Polen).
     this.tipoSel = this.tipoVista;
     this.tipoOtro = '';
     this.errorForm = '';
     this.mostrarModal = true;
+    this.cargarCatalogosModal();
+  }
 
-    this.variedadService.tipos().subscribe({
-      next: (tipos) => {
-        this.tiposInventario = tipos.length ? tipos : ['SEMILLA'];
+  editar(s: Semilla): void {
+    this.editandoId = s.variedadId;
+    this.form = this.formVacio();
+    this.tipoOtro = '';
+    this.errorForm = '';
+    this.mostrarModal = true;
+    this.cargarCatalogosModal();
+
+    this.variedadService.buscar(s.variedadId).subscribe({
+      next: (v) => {
+        const tipo = v.tipo ?? 'SEMILLA';
+        this.form = {
+          nombre: v.nombre ?? '',
+          descripcion: v.descripcion ?? '',
+          numeroBass: v.numeroBass,
+          fechaInicio: v.fechaInicio ? v.fechaInicio.substring(0, 10) : null,
+          fechaPoda: v.fechaPoda ? v.fechaPoda.substring(0, 10) : null,
+          invernaderoId: v.invernaderoId,
+          parental: v.parental ?? '',
+          tipo,
+        };
+        if (!this.tiposInventario.includes(tipo)) {
+          this.tiposInventario = [...this.tiposInventario, tipo];
+        }
+        this.tipoSel = tipo;
         this.cdr.markForCheck();
       },
-      error: () => { /* deja el fallback ['SEMILLA'] */ },
+      error: (err) => {
+        this.errorForm = err?.error?.message || 'No se pudo cargar la variedad.';
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private cargarCatalogosModal(): void {
+    this.variedadService.tipos().subscribe({
+      next: (tipos) => {
+        const lista = tipos.length ? [...tipos] : ['SEMILLA'];
+        if (this.tipoSel && this.tipoSel !== this.OTRO && !lista.includes(this.tipoSel)) {
+          lista.push(this.tipoSel);
+        }
+        this.tiposInventario = lista;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.cdr.markForCheck(); },
     });
 
     if (this.invernaderos.length === 0) {
@@ -111,7 +154,10 @@ export class Inventario implements OnInit {
           this.invernaderos = data;
           this.cdr.markForCheck();
         },
-        error: () => this.notificacion.error('No se pudieron cargar los invernaderos'),
+        error: () => {
+          this.notificacion.error('No se pudieron cargar los invernaderos');
+          this.cdr.markForCheck();
+        },
       });
     }
   }
@@ -139,17 +185,23 @@ export class Inventario implements OnInit {
     this.guardando = true;
     this.errorForm = '';
 
-    this.variedadService.guardar(this.form).subscribe({
+    const editando = this.editandoId != null;
+    const peticion = editando
+      ? this.variedadService.actualizar(this.editandoId as number, this.form)
+      : this.variedadService.guardar(this.form);
+
+    peticion.subscribe({
       next: () => {
         this.guardando = false;
         this.cerrarModal();
-        this.notificacion.exito('Variedad agregada correctamente');
+        this.notificacion.exito(editando ? 'Variedad actualizada correctamente' : 'Variedad agregada correctamente');
         this.cargar();
+        this.cdr.markForCheck();
       },
-      error: () => {
-        this.errorForm = 'Error al guardar. Intenta de nuevo.';
+      error: (err) => {
+        this.errorForm = err?.error?.message || 'Error al guardar. Intenta de nuevo.';
         this.guardando = false;
-        this.notificacion.error('Error al guardar la variedad');
+        this.notificacion.error(editando ? 'Error al actualizar la variedad' : 'Error al guardar la variedad');
         this.cdr.markForCheck();
       },
     });
@@ -181,6 +233,7 @@ export class Inventario implements OnInit {
       : '—';
 
     return {
+      variedadId:   item.variedadId,
       icono:        this.getIcono(item.variedad),
       iconoBg:      this.getIconoBg(item.nivel),
       nombre:       item.variedad,

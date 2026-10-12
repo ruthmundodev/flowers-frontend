@@ -514,3 +514,20 @@ html[data-theme='dark'] .tipo-tab.active i { color: #cfe6cf; }
 }
 .link-add:hover { text-decoration: underline; }
 html[data-theme='dark'] .link-add { color: var(--d-primary-ink, #b8d8b8); }
+
+.inv-table .col-acciones { text-align: right; white-space: nowrap; }
+.inv-table .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ddd9cf;
+  border-radius: 7px;
+  background: #fff;
+  color: #1e3320;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.inv-table .btn-icon:hover { background: #f0ede6; }
+.inv-table .btn-icon i { font-size: 15px; }
