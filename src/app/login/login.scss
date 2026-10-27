@@ -49,7 +49,7 @@
   margin-bottom: auto;
 }
 
-.ll-brand-dot { width: 10px; height: 10px; border-radius: 50%; background: #7ec47e; }
+.ll-brand-logo { width: 28px; height: 28px; background: #7ec47e; -webkit-mask: url(/logo.png) center / contain no-repeat; mask: url(/logo.png) center / contain no-repeat; }
 .ll-brand-name { font-size: 15px; font-weight: 500; color: #e8f5e8; letter-spacing: 0.03em; }
 
 .ll-hero { margin-bottom: auto; }
@@ -85,7 +85,7 @@
 }
 
 .lr-brand { display: flex; align-items: center; gap: 7px; margin-bottom: 28px; }
-.lr-brand-dot { width: 7px; height: 7px; border-radius: 50%; background: #3B6D11; }
+.lr-brand-logo { width: 18px; height: 18px; background: #3B6D11; -webkit-mask: url(/logo.png) center / contain no-repeat; mask: url(/logo.png) center / contain no-repeat; }
 .lr-brand-text { font-size: 11px; color: #999; }
 
 .lr-title { font-size: 20px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
