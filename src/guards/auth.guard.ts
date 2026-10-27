@@ -17,6 +17,11 @@ export const authGuard: CanActivateFn = (route) => {
     return router.parseUrl('/login');
   }
 
+  if (auth.tokenExpirado()) {
+    auth.logout();
+    return router.parseUrl('/login');
+  }
+
   if (!auth.sesionValida()) {
     auth.logout();
     return router.parseUrl('/login?sesionInvalida=1');

@@ -37,6 +37,11 @@ export class Auth {
     return !!localStorage.getItem('token');
   }
 
+  tokenExpirado(): boolean {
+    const exp = this.decodeToken()?.['exp'];
+    return typeof exp === 'number' && exp * 1000 <= Date.now();
+  }
+
   getUsuario(): UsuarioSession | null {
     const data = localStorage.getItem('usuario');
     if (!data) return null;
