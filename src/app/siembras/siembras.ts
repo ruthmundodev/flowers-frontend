@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
 import { Sidebar } from '../shared/sidebar/sidebar';
 import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { PuedeDirective } from '../../directives/puede.directive';
+import { Auth } from '../../services/services/auth';
 import { CultivoService } from '../../services/services/cultivo';
 import { InvernaderoService } from '../../services/services/invernadero';
 import { TemporadaService } from '../../services/services/temporada';
@@ -59,6 +60,9 @@ export class Siembras implements OnInit {
   formCosecha: CosechaRequest = this.formCosechaVacio();
 
   private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(Auth);
 
   constructor(
     private cultivoService: CultivoService,
@@ -85,6 +89,10 @@ export class Siembras implements OnInit {
       error: () => this.notificacion.error('Error al cargar los catálogos'),
     });
     this.cargar();
+    if (this.route.snapshot.queryParamMap.has('nueva')) {
+      if (this.auth.puede('Temporada', 'crear')) this.abrirCrear();
+      this.router.navigate([], { queryParams: { nueva: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    }
   }
 
   private cargar(): void {

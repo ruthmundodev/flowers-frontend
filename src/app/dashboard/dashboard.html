@@ -13,10 +13,10 @@
                     <i class="ti ti-search"></i>
                     <input type="text" placeholder="Buscar cultivo, parcela..." />
                 </div>
-                <button class="btn-new">
+                <a class="btn-new" *appPuede="'Temporada:crear'" routerLink="/siembras" [queryParams]="{ nueva: 1 }">
                     <i class="ti ti-plus"></i>
                     Nueva siembra
-                </button>
+                </a>
             </div>
         </div>
 

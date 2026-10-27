@@ -6,13 +6,14 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { forkJoin, of } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { Sidebar } from '../shared/sidebar/sidebar';
+import { PuedeDirective } from '../../directives/puede.directive';
 import { DashboardService } from '../../services/services/dashboard';
 import { InvernaderoService } from '../../services/services/invernadero';
 import { CosechaMes, DashboardCultivo, DashboardStats } from '../../interfaces/dashboard.interfaces';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterModule, Sidebar],
+  imports: [CommonModule, RouterModule, Sidebar, PuedeDirective],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
